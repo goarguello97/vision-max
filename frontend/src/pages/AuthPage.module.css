@@ -1,0 +1,106 @@
+.authPage {
+  min-height: calc(100vh - 200px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--spacing-lg);
+}
+
+.authCard {
+  width: 100%;
+  max-width: 400px;
+  background: var(--color-bg-card);
+  border-radius: var(--radius-xl);
+  padding: var(--spacing-xl);
+  box-shadow: var(--shadow-card);
+  border: 1px solid var(--color-bg-elevated);
+}
+
+.title {
+  font-family: var(--font-display);
+  font-size: 2.5rem;
+  text-align: center;
+  margin-bottom: var(--spacing-xs);
+  letter-spacing: 0.05em;
+}
+
+.subtitle {
+  text-align: center;
+  color: var(--color-text-secondary);
+  margin-bottom: var(--spacing-lg);
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+}
+
+.label {
+  font-size: 0.875rem;
+  color: var(--color-text-secondary);
+  font-weight: 500;
+}
+
+.input {
+  padding: var(--spacing-md);
+  background: var(--color-bg-secondary);
+  border: 1px solid var(--color-bg-elevated);
+  border-radius: var(--radius-md);
+  color: var(--color-text-primary);
+  font-size: 1rem;
+  transition: border-color 0.2s ease-out, box-shadow 0.2s ease-out;
+}
+
+.input::placeholder {
+  color: var(--color-text-muted);
+}
+
+.input:focus {
+  outline: none;
+  border-color: var(--color-accent-gold);
+  box-shadow: 0 0 0 3px var(--color-accent-gold-glow);
+}
+
+.fieldError {
+  font-size: 0.75rem;
+  color: var(--color-error);
+}
+
+.submitBtn {
+  margin-top: var(--spacing-sm);
+  width: 100%;
+}
+
+.error {
+  background: rgba(196, 30, 58, 0.1);
+  border: 1px solid var(--color-error);
+  color: var(--color-error);
+  padding: var(--spacing-sm) var(--spacing-md);
+  border-radius: var(--radius-md);
+  margin-bottom: var(--spacing-md);
+  text-align: center;
+  font-size: 0.875rem;
+}
+
+.switch {
+  text-align: center;
+  margin-top: var(--spacing-lg);
+  color: var(--color-text-secondary);
+  font-size: 0.875rem;
+}
+
+.switch a {
+  color: var(--color-accent-gold);
+  font-weight: 600;
+}
+
+.switch a:hover {
+  text-decoration: underline;
+}
