@@ -30,17 +30,25 @@ export interface CreditsResponse {
 }
 
 /**
- * Repositorio que maneja las operaciones de películas con TMDB.
- * Soporta modo mock para desarrollo sin API.
+ * Repositorio que maneja las operaciones de películas con la API de TMDB.
+ * Implementa el patrón Repository para abstraer el acceso a datos (mock o TMDB real).
+ * Utiliza tmdbClient para realizar las peticiones HTTP a los endpoints de TMDB.
  * @class MovieRepository
+ * @see {@link https://developer.themoviedb.org/reference} TMDB API Reference
  */
 class MovieRepository {
   /**
-   * Obtiene las películas populares del momento.
+   * Obtiene las películas populares del momento desde TMDB.
+   * Consulta el endpoint GET /movie/popular con paginación.
    * @async
    * @method getPopular
-   * @param {number} [page=1] - Número de página
-   * @returns {Promise<MovieResponse>} Respuesta con lista de películas
+   * @param {number} [page=1] - Número de página para paginación (default: 1)
+   * @returns {Promise<MovieResponse>} Respuesta cruda de TMDB con lista de películas y metadatos de paginación
+   * @throws {Error} Si la petición a TMDB falla o retorna error
+   * @see {@link https://developer.themoviedb.org/reference/movie-popular-list} TMDB API - Movie Popular List
+   * @example
+   * const response = await movieRepository.getPopular(1);
+   * console.log(response.results.length, response.total_pages);
    */
   async getPopular(page: number = 1): Promise<MovieResponse> {
     logger.info('MovieRepository.getPopular', { page, mockMode: config.mockMode });
@@ -54,12 +62,17 @@ class MovieRepository {
   }
 
   /**
-   * Busca películas por título.
+   * Busca películas por título utilizando el endpoint /search/movie de TMDB.
    * @async
    * @method search
-   * @param {string} query - Término de búsqueda
-   * @param {number} [page=1] - Número de página
-   * @returns {Promise<MovieResponse>} Respuesta con resultados de búsqueda
+   * @param {string} query - Término de búsqueda (título de la película)
+   * @param {number} [page=1] - Número de página para paginación (default: 1)
+   * @returns {Promise<MovieResponse>} Respuesta cruda de TMDB con resultados de búsqueda y metadatos de paginación
+   * @throws {Error} Si la query está vacía o la petición a TMDB falla
+   * @see {@link https://developer.themoviedb.org/reference/search-movie} TMDB API - Search Movies
+   * @example
+   * const response = await movieRepository.search('Fight Club');
+   * console.log(response.results[0].title);
    */
   async search(query: string, page: number = 1): Promise<MovieResponse> {
     logger.info('MovieRepository.search', { query, page, mockMode: config.mockMode });
@@ -76,11 +89,18 @@ class MovieRepository {
   }
 
   /**
-   * Obtiene el detalle de una película y sus créditos.
+   * Obtiene el detalle completo de una película y sus créditos (reparto/equipo).
+   * Realiza dos peticiones en paralelo a los endpoints /movie/{id} y /movie/{id}/credits de TMDB.
    * @async
    * @method getById
-   * @param {number} id - ID de la película
-   * @returns {Promise<{movie: unknown, credits: unknown}>} Detalle y créditos
+   * @param {number} id - ID único de la película en TMDB
+   * @returns {Promise<{movie: unknown, credits: unknown}>} Objeto con detalle de película y créditos sin procesar de TMDB
+   * @throws {Error} Si la película no existe (TMDB retorna 404) o la petición falla
+   * @see {@link https://developer.themoviedb.org/reference/movie-details} TMDB API - Movie Details
+   * @see {@link https://developer.themoviedb.org/reference/movie-credits} TMDB API - Movie Credits
+   * @example
+   * const { movie, credits } = await movieRepository.getById(550);
+   * const director = credits.crew.find(c => c.job === 'Director');
    */
   async getById(id: number): Promise<{ movie: unknown; credits: unknown }> {
     logger.info('MovieRepository.getById', { id, mockMode: config.mockMode });
@@ -103,11 +123,17 @@ class MovieRepository {
   }
 
   /**
-   * Obtiene las reseñas de una película.
+   * Obtiene las reseñas de una película específica desde TMDB.
+   * Consulta el endpoint GET /movie/{id}/reviews.
    * @async
    * @method getReviews
-   * @param {number} movieId - ID de la película
-   * @returns {Promise<unknown[]>} Lista de reseñas
+   * @param {number} movieId - ID único de la película en TMDB
+   * @returns {Promise<unknown[]>} Array de reseñas crudas de TMDB (sin transformar)
+   * @throws {Error} Si la petición a TMDB falla
+   * @see {@link https://developer.themoviedb.org/reference/movie-reviews} TMDB API - Movie Reviews
+   * @example
+   * const reviews = await movieRepository.getReviews(550);
+   * reviews.forEach(r => console.log(r.author, r.content));
    */
   async getReviews(movieId: number): Promise<unknown[]> {
     logger.info('MovieRepository.getReviews', { movieId, mockMode: config.mockMode });
