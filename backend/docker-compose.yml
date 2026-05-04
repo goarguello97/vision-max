@@ -1,0 +1,53 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: visionmax-db
+    environment:
+      POSTGRES_USER: visionmax
+      POSTGRES_PASSWORD: visionmax_secret_password
+      POSTGRES_DB: visionmax
+      PGDATA: /var/lib/postgresql/data/pgdata
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U visionmax -d visionmax"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: visionmax-api
+    ports:
+      - "3000:3000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: postgresql://visionmax:visionmax_secret_password@postgres:5432/visionmax
+      JWT_SECRET: your-256-bit-secret-key-replace-in-production
+      JWT_EXPIRES_IN: 7d
+      TMDB_API_KEY: ${TMDB_API_KEY:-}
+      TMDB_BASE_URL: https://api.themoviedb.org/3
+      TMDB_IMAGE_URL: https://image.tmdb.org/t/p
+      PORT: 3000
+      NODE_ENV: development
+      FRONTEND_URL: http://localhost:5173
+      MOCK_MODE: "true"
+    volumes:
+      - ./src:/app/src
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+volumes:
+  postgres_data:
