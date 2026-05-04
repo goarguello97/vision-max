@@ -1,7 +1,16 @@
+/**
+ * @fileoverview Manejadores de errores para Express
+ * @module utils/errorHandler
+ */
+
 import { Request, Response, NextFunction } from 'express';
 import { AppError } from './AppError';
 import { logger } from './logger';
 
+/**
+ * Estructura de respuesta de error.
+ * @interface ErrorResponse
+ */
 interface ErrorResponse {
   status: string;
   message: string;
@@ -9,6 +18,14 @@ interface ErrorResponse {
   stack?: string;
 }
 
+/**
+ * Middleware de manejo de errores centralizado.
+ * @function errorHandler
+ * @param {Error} err - Error thrown
+ * @param {Request} req - Request de Express
+ * @param {Response} res - Response de Express
+ * @param {NextFunction} _next - Función next de Express
+ */
 export const errorHandler = (
   err: Error,
   req: Request,
@@ -55,6 +72,12 @@ export const errorHandler = (
   res.status(500).json(response);
 };
 
+/**
+ * Middleware para manejar rutas no encontradas.
+ * @function notFoundHandler
+ * @param {Request} req - Request de Express
+ * @param {Response} res - Response de Express
+ */
 export const notFoundHandler = (req: Request, res: Response): void => {
   res.status(404).json({
     status: 'error',

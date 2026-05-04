@@ -1,7 +1,16 @@
+/**
+ * @fileoverview Configuración global de la aplicación
+ * @module config
+ */
+
 import dotenv from 'dotenv';
 
 dotenv.config();
 
+/**
+ * Interfaz que define la estructura de configuración de la aplicación.
+ * @interface Config
+ */
 interface Config {
   port: number;
   nodeEnv: string;

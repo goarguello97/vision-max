@@ -1,3 +1,14 @@
+/**
+ * @fileoverview Clases de errores personalizados para la aplicación
+ * @module utils/AppError
+ */
+
+/**
+ * Clase base para errores operativos de la aplicación.
+ * Extiende Error native con códigos de estado HTTP y códigos de error.
+ * @class AppError
+ * @extends Error
+ */
 export class AppError extends Error {
   public readonly statusCode: number;
   public readonly isOperational: boolean;
@@ -14,12 +25,22 @@ export class AppError extends Error {
   }
 }
 
+/**
+ * Error para recursos no encontrados (404).
+ * @class NotFoundError
+ * @extends AppError
+ */
 export class NotFoundError extends AppError {
   constructor(message: string = 'Recurso no encontrado') {
     super(message, 404, 'NOT_FOUND');
   }
 }
 
+/**
+ * Error para solicitudes inválidas (400).
+ * @class BadRequestError
+ * @extends AppError
+ */
 export class BadRequestError extends AppError {
   constructor(message: string = 'Solicitud inválida') {
     super(message, 400, 'BAD_REQUEST');

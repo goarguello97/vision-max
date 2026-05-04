@@ -1,5 +1,14 @@
+/**
+ * @fileoverview Configuración específica para la API de The Movie Database (TMDB)
+ * @module config/tmdb
+ */
+
 import config from './index';
 
+/**
+ * Configuración de TMDB extraída de las variables de entorno.
+ * @constant {Object}
+ */
 export const TMDB_CONFIG = {
   apiKey: config.tmdb.apiKey,
   baseUrl: config.tmdb.baseUrl,
@@ -8,6 +17,10 @@ export const TMDB_CONFIG = {
   mockMode: config.mockMode,
 };
 
+/**
+ * Tamaños disponibles para imágenes de pósters.
+ * @constant {Object}
+ */
 export const IMAGE_SIZES = {
   poster: {
     small: 'w185',
