@@ -116,9 +116,10 @@ class MovieService {
    */
   async getPopular(page: number = 1): Promise<MovieListResponse> {
     logger.info('Fetching popular movies', { page, mockMode: config.mockMode });
-
+    
     if (config.mockMode) {
       const mockResult = getMockMovies(page, 20);
+      
       return {
         page,
         results: mockResult.results as Movie[],

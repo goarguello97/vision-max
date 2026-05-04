@@ -63,7 +63,6 @@ class MovieRepository {
    */
   async search(query: string, page: number = 1): Promise<MovieResponse> {
     logger.info('MovieRepository.search', { query, page, mockMode: config.mockMode });
-
     if (config.mockMode) {
       const result = searchMockMovies(query);
       return { ...result, page };

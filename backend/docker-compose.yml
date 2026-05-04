@@ -33,13 +33,14 @@ services:
       DATABASE_URL: postgresql://visionmax:visionmax_secret_password@postgres:5432/visionmax
       JWT_SECRET: your-256-bit-secret-key-replace-in-production
       JWT_EXPIRES_IN: 7d
-      TMDB_API_KEY: ${TMDB_API_KEY:-}
+      TMDB_API_KEY: ${TMDB_API_KEY}
       TMDB_BASE_URL: https://api.themoviedb.org/3
       TMDB_IMAGE_URL: https://image.tmdb.org/t/p
       PORT: 3000
       NODE_ENV: development
       FRONTEND_URL: http://localhost:5173
-      MOCK_MODE: "true"
+      MOCK_MODE: ${MOCK_MODE}
+    command: npm run dev
     volumes:
       - ./src:/app/src
       - /app/node_modules
