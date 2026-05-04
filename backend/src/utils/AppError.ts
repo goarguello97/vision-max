@@ -47,18 +47,33 @@ export class BadRequestError extends AppError {
   }
 }
 
+/**
+ * Error para autenticación fallida (401).
+ * @class UnauthorizedError
+ * @extends AppError
+ */
 export class UnauthorizedError extends AppError {
   constructor(message: string = 'No autorizado') {
     super(message, 401, 'UNAUTHORIZED');
   }
 }
 
+/**
+ * Error para acceso denegado (403).
+ * @class ForbiddenError
+ * @extends AppError
+ */
 export class ForbiddenError extends AppError {
   constructor(message: string = 'Acceso denegado') {
     super(message, 403, 'FORBIDDEN');
   }
 }
 
+/**
+ * Error para conflictos de datos (409).
+ * @class ConflictError
+ * @extends AppError
+ */
 export class ConflictError extends AppError {
   constructor(message: string = 'Conflicto de datos') {
     super(message, 409, 'CONFLICT');
