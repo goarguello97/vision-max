@@ -12,6 +12,7 @@ import config from './config';
 import routes from './routes';
 import { errorHandler, notFoundHandler } from './middlewares/errorMiddleware';
 import { logger } from './utils/logger';
+import { swaggerDocs, setupSwagger } from './config/swagger';
 
 /**
  * Instancia de la aplicación Express
@@ -66,6 +67,11 @@ app.use((req, res, next) => {
  * Configuración de rutas principales
  */
 app.use('/', routes);
+
+/**
+ * Documentación Swagger
+ */
+app.use('/api-docs', swaggerDocs, setupSwagger);
 
 /**
  * Middleware para manejar rutas no encontradas

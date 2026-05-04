@@ -17,76 +17,204 @@ router.use(authMiddleware);
 router.use(adminMiddleware);
 
 /**
- * @route GET /admin/users
- * @description Obtiene la lista de usuarios
- * @query {number} page - Número de página
- * @query {number} limit - Límite de resultados
- * @requires auth - Requiere autenticación
- * @requires admin - Requiere rol de administrador
+ * @swagger
+ * /admin/users:
+ *   get:
+ *     tags: [Admin]
+ *     summary: Get all users
+ *     description: Returns a list of all users (admin only)
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: query
+ *         name: page
+ *         schema:
+ *           type: integer
+ *           default: 1
+ *         description: Page number
+ *       - in: query
+ *         name: limit
+ *         schema:
+ *           type: integer
+ *           default: 20
+ *         description: Results per page
+ *     responses:
+ *       200:
+ *         description: List of users
+ *       403:
+ *         description: Forbidden - Admin only
  */
 router.get('/users', adminController.getUsers);
 
 /**
- * @route PUT /admin/users/:id/ban
- * @description Banea a un usuario
- * @param {number} id - ID del usuario
- * @requires auth - Requiere autenticación
- * @requires admin - Requiere rol de administrador
+ * @swagger
+ * /admin/users/{id}/ban:
+ *   put:
+ *     tags: [Admin]
+ *     summary: Ban user
+ *     description: Bans a user (admin only)
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: User ID
+ *     responses:
+ *       200:
+ *         description: User banned
+ *       404:
+ *         description: User not found
  */
 router.put('/users/:id/ban', adminController.banUser);
 
 /**
- * @route PUT /admin/users/:id/unban
- * @description Desbanea a un usuario
- * @param {number} id - ID del usuario
- * @requires auth - Requiere autenticación
- * @requires admin - Requiere rol de administrador
+ * @swagger
+ * /admin/users/{id}/unban:
+ *   put:
+ *     tags: [Admin]
+ *     summary: Unban user
+ *     description: Unbans a user (admin only)
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: User ID
+ *     responses:
+ *       200:
+ *         description: User unbanned
+ *       404:
+ *         description: User not found
  */
 router.put('/users/:id/unban', adminController.unbanUser);
 
 /**
- * @route PUT /admin/users/:id/grant-admin
- * @description Concede permisos de administrador
- * @param {number} id - ID del usuario
- * @requires auth - Requiere autenticación
- * @requires admin - Requiere rol de administrador
+ * @swagger
+ * /admin/users/{id}/grant-admin:
+ *   put:
+ *     tags: [Admin]
+ *     summary: Grant admin role
+ *     description: Grants admin role to a user (admin only)
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: User ID
+ *     responses:
+ *       200:
+ *         description: Admin role granted
+ *       404:
+ *         description: User not found
  */
 router.put('/users/:id/grant-admin', adminController.grantAdmin);
 
 /**
- * @route DELETE /admin/reviews/:id
- * @description Elimina una reseña
- * @param {number} id - ID de la reseña
- * @requires auth - Requiere autenticación
- * @requires admin - Requiere rol de administrador
+ * @swagger
+ * /admin/reviews/{id}:
+ *   delete:
+ *     tags: [Admin]
+ *     summary: Delete review
+ *     description: Deletes any review (admin only)
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: Review ID
+ *     responses:
+ *       200:
+ *         description: Review deleted
+ *       404:
+ *         description: Review not found
  */
 router.delete('/reviews/:id', adminController.deleteReview);
 
 /**
- * @route PUT /admin/reviews/:id
- * @description Actualiza la visibilidad de una reseña
- * @param {number} id - ID de la reseña
- * @body {boolean} isHidden - Estado de visibilidad
- * @requires auth - Requiere autenticación
- * @requires admin - Requiere rol de administrador
+ * @swagger
+ * /admin/reviews/{id}:
+ *   put:
+ *     tags: [Admin]
+ *     summary: Update review visibility
+ *     description: Updates review visibility (admin only)
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: Review ID
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               isHidden:
+ *                 type: boolean
+ *     responses:
+ *       200:
+ *         description: Review updated
+ *       404:
+ *         description: Review not found
  */
 router.put('/reviews/:id', adminController.updateReview);
 
 /**
- * @route GET /admin/logs
- * @description Obtiene los logs de administración
- * @query {number} page - Número de página
- * @query {number} limit - Límite de resultados
- * @requires auth - Requiere autenticación
- * @requires admin - Requiere rol de administrador
+ * @swagger
+ * /admin/logs:
+ *   get:
+ *     tags: [Admin]
+ *     summary: Get admin logs
+ *     description: Returns admin activity logs (admin only)
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: query
+ *         name: page
+ *         schema:
+ *           type: integer
+ *           default: 1
+ *         description: Page number
+ *       - in: query
+ *         name: limit
+ *         schema:
+ *           type: integer
+ *           default: 20
+ *         description: Results per page
+ *     responses:
+ *       200:
+ *         description: List of admin logs
  */
 router.get('/logs', adminController.getLogs);
 
 /**
- * @route GET /admin/stats
- * @description Obtiene estadísticas del sistema
- * @requires auth - Requiere autenticación
- * @requires admin - Requiere rol de administrador
+ * @swagger
+ * /admin/stats:
+ *   get:
+ *     tags: [Admin]
+ *     summary: Get system statistics
+ *     description: Returns system statistics (admin only)
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: System statistics
  */
 router.get('/stats', adminController.getStats);
 

@@ -24,7 +24,7 @@ Plataforma para explorar películas usando la API de TMDB, donde usuarios regist
 | Backend Runtime | Node.js |
 | Backend Framework | Express |
 | Language | TypeScript |
-| API Documentation | tsoa (Swagger) |
+| API Documentation | swagger-jsdoc + swagger-ui-express |
 | Database | PostgreSQL |
 | ORM | Prisma |
 | Password Hashing | bcrypt |
@@ -459,10 +459,11 @@ Para implementar el frontend, cargar la skill `frontend-design` que provee instr
 - Explicar lógica de negocio compleja
 - Documentar decisiones de diseño
 
-### Swagger (tsoa)
-- Dekorators en todos los endpoints
+### Swagger (swagger-jsdoc)
+- Anotaciones JSDoc en rutas
 - Descripciones y ejemplos
 - Tags para agrupar
+- UI en /api-docs
 
 ---
 
