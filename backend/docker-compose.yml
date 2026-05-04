@@ -39,7 +39,7 @@ services:
       PORT: 3000
       NODE_ENV: development
       FRONTEND_URL: http://localhost:5173
-      MOCK_MODE: "true"
+      MOCK_MODE: ${MOCK_MODE}
     volumes:
       - ./src:/app/src
       - /app/node_modules
