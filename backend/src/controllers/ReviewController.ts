@@ -1,9 +1,27 @@
+/**
+ * @fileoverview Controlador de reseñas de películas
+ * @module controllers/ReviewController
+ */
+
 import { Request, Response, NextFunction } from 'express';
 import { reviewService } from '../services/ReviewService';
 import { createReviewSchema, updateReviewSchema } from '../models/schemas';
 import { ZodError } from 'zod';
 
+/**
+ * Controlador que maneja las solicitudes HTTP relacionadas con reseñas.
+ * @class ReviewController
+ */
 export class ReviewController {
+  /**
+   * Crea una nueva reseña.
+   * @async
+   * @method create
+   * @param {Request} req - Solicitud HTTP con datos de la reseña
+   * @param {Response} res - Respuesta HTTP
+   * @param {NextFunction} next - Función de siguiente middleware
+   * @returns {Promise<void>}
+   */
   async create(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
       const user = (req as unknown as { user: { id: number } }).user;
@@ -32,6 +50,15 @@ export class ReviewController {
     }
   }
 
+  /**
+   * Actualiza una reseña existente.
+   * @async
+   * @method update
+   * @param {Request} req - Solicitud HTTP con id de reseña y datos actualizados
+   * @param {Response} res - Respuesta HTTP
+   * @param {NextFunction} next - Función de siguiente middleware
+   * @returns {Promise<void>}
+   */
   async update(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
       const user = (req as unknown as { user: { id: number } }).user;
@@ -69,6 +96,15 @@ export class ReviewController {
     }
   }
 
+  /**
+   * Elimina una reseña.
+   * @async
+   * @method delete
+   * @param {Request} req - Solicitud HTTP con id de reseña
+   * @param {Response} res - Respuesta HTTP
+   * @param {NextFunction} next - Función de siguiente middleware
+   * @returns {Promise<void>}
+   */
   async delete(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
       const user = (req as unknown as { user: { id: number; role: string } }).user;
@@ -94,6 +130,15 @@ export class ReviewController {
     }
   }
 
+  /**
+   * Obtiene las reseñas de una película.
+   * @async
+   * @method getByMovie
+   * @param {Request} req - Solicitud HTTP con movieId y parámetros de paginación
+   * @param {Response} res - Respuesta HTTP
+   * @param {NextFunction} next - Función de siguiente middleware
+   * @returns {Promise<void>}
+   */
   async getByMovie(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
       const movieId = parseInt(req.params.movieId, 10);

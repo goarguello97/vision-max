@@ -1,3 +1,8 @@
+/**
+ * @fileoverview Servicio de autenticación de usuarios
+ * @module services/AuthService
+ */
+
 import { userRepository } from '../repositories/UserRepository';
 import { hashPassword, comparePassword } from '../utils/bcrypt';
 import { generateToken } from '../utils/jwt';
@@ -6,7 +11,20 @@ import { ConflictError, UnauthorizedError, NotFoundError, ForbiddenError } from 
 import { RegisterInput, LoginInput } from '../models/schemas';
 import { logger } from '../utils/logger';
 
+/**
+ * Servicio que maneja las operaciones de autenticación de usuarios.
+ * Proporciona métodos para registro, login y obtención de información del usuario.
+ * @class AuthService
+ */
 export class AuthService {
+  /**
+   * Registra un nuevo usuario en el sistema.
+   * @async
+   * @method register
+   * @param {RegisterInput} input - Datos de registro del usuario
+   * @returns {Promise<{user: AuthUser, token: string}>} Usuario creado y token JWT
+   * @throws {ConflictError} Si el email ya está registrado
+   */
   async register(input: RegisterInput): Promise<{ user: AuthUser; token: string }> {
     logger.info('AuthService.register', { email: input.email });
 
@@ -46,6 +64,15 @@ export class AuthService {
     };
   }
 
+  /**
+   * Autentica a un usuario con sus credenciales.
+   * @async
+   * @method login
+   * @param {LoginInput} input - Credenciales del usuario
+   * @returns {Promise<{user: AuthUser, token: string}>} Usuario autenticado y token JWT
+   * @throws {UnauthorizedError} Si las credenciales son inválidas
+   * @throws {ForbiddenError} Si el usuario está baneado
+   */
   async login(input: LoginInput): Promise<{ user: AuthUser; token: string }> {
     logger.info('AuthService.login', { email: input.email });
 
@@ -86,6 +113,14 @@ export class AuthService {
     };
   }
 
+  /**
+   * Obtiene la información del usuario autenticado.
+   * @async
+   * @method getMe
+   * @param {number} userId - ID del usuario
+   * @returns {Promise<AuthUser>} Datos del usuario
+   * @throws {NotFoundError} Si el usuario no existe
+   */
   async getMe(userId: number): Promise<AuthUser> {
     const user = await userRepository.findById(userId);
     if (!user) {

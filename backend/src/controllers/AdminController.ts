@@ -1,8 +1,27 @@
+/**
+ * @fileoverview Controlador de administración del sistema
+ * @module controllers/AdminController
+ */
+
 import { Request, Response, NextFunction } from 'express';
 import { adminService } from '../services/AdminService';
 import { userRepository } from '../repositories/UserRepository';
 
+/**
+ * Controlador que maneja las solicitudes HTTP de administración.
+ * Requiere rol de administrador para todas las operaciones.
+ * @class AdminController
+ */
 export class AdminController {
+  /**
+   * Obtiene la lista de usuarios con paginación.
+   * @async
+   * @method getUsers
+   * @param {Request} req - Solicitud HTTP con parámetros page y limit
+   * @param {Response} res - Respuesta HTTP
+   * @param {NextFunction} next - Función de siguiente middleware
+   * @returns {Promise<void>}
+   */
   async getUsers(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
       const page = parseInt(req.query.page as string, 10) || 1;
@@ -24,6 +43,15 @@ export class AdminController {
     }
   }
 
+  /**
+   * Banea a un usuario.
+   * @async
+   * @method banUser
+   * @param {Request} req - Solicitud HTTP con id de usuario
+   * @param {Response} res - Respuesta HTTP
+   * @param {NextFunction} next - Función de siguiente middleware
+   * @returns {Promise<void>}
+   */
   async banUser(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
       const admin = (req as unknown as { user: { id: number } }).user;
@@ -48,6 +76,15 @@ export class AdminController {
     }
   }
 
+  /**
+   * Desbanea a un usuario.
+   * @async
+   * @method unbanUser
+   * @param {Request} req - Solicitud HTTP con id de usuario
+   * @param {Response} res - Respuesta HTTP
+   * @param {NextFunction} next - Función de siguiente middleware
+   * @returns {Promise<void>}
+   */
   async unbanUser(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
       const admin = (req as unknown as { user: { id: number } }).user;
@@ -72,6 +109,15 @@ export class AdminController {
     }
   }
 
+  /**
+   * Concede permisos de administrador a un usuario.
+   * @async
+   * @method grantAdmin
+   * @param {Request} req - Solicitud HTTP con id de usuario
+   * @param {Response} res - Respuesta HTTP
+   * @param {NextFunction} next - Función de siguiente middleware
+   * @returns {Promise<void>}
+   */
   async grantAdmin(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
       const admin = (req as unknown as { user: { id: number } }).user;
@@ -96,6 +142,15 @@ export class AdminController {
     }
   }
 
+  /**
+   * Elimina una reseña.
+   * @async
+   * @method deleteReview
+   * @param {Request} req - Solicitud HTTP con id de reseña
+   * @param {Response} res - Respuesta HTTP
+   * @param {NextFunction} next - Función de siguiente middleware
+   * @returns {Promise<void>}
+   */
   async deleteReview(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
       const admin = (req as unknown as { user: { id: number } }).user;
@@ -120,6 +175,15 @@ export class AdminController {
     }
   }
 
+  /**
+   * Actualiza la visibilidad de una reseña.
+   * @async
+   * @method updateReview
+   * @param {Request} req - Solicitud HTTP con id de reseña y estado isHidden
+   * @param {Response} res - Respuesta HTTP
+   * @param {NextFunction} next - Función de siguiente middleware
+   * @returns {Promise<void>}
+   */
   async updateReview(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
       const admin = (req as unknown as { user: { id: number } }).user;
@@ -145,6 +209,15 @@ export class AdminController {
     }
   }
 
+  /**
+   * Obtiene los logs de administración.
+   * @async
+   * @method getLogs
+   * @param {Request} req - Solicitud HTTP con parámetros page y limit
+   * @param {Response} res - Respuesta HTTP
+   * @param {NextFunction} next - Función de siguiente middleware
+   * @returns {Promise<void>}
+   */
   async getLogs(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
       const page = parseInt(req.query.page as string, 10) || 1;
@@ -166,6 +239,15 @@ export class AdminController {
     }
   }
 
+  /**
+   * Obtiene estadísticas del sistema.
+   * @async
+   * @method getStats
+   * @param {Request} req - Solicitud HTTP
+   * @param {Response} res - Respuesta HTTP
+   * @param {NextFunction} next - Función de siguiente middleware
+   * @returns {Promise<void>}
+   */
   async getStats(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
       const stats = await adminService.getStats();
