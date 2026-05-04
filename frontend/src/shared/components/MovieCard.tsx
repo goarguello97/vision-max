@@ -1,7 +1,16 @@
+/**
+ * @fileoverview Componente de tarjeta de película
+ * @module shared/components/MovieCard
+ */
+
 import { Link } from 'react-router-dom';
 import type { Movie } from '../types';
 import styles from './MovieCard.module.css';
 
+/**
+ * Props del componente MovieCard.
+ * @interface MovieCardProps
+ */
 interface MovieCardProps {
   movie: Movie;
 }

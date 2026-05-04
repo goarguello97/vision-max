@@ -1,3 +1,8 @@
+/**
+ * @fileoverview Componente de barra de navegación
+ * @module shared/components/Navbar
+ */
+
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
 import Button from './Button';

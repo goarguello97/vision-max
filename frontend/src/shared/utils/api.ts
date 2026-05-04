@@ -1,3 +1,8 @@
+/**
+ * @fileoverview Cliente API centralizado usando Axios
+ * @module shared/utils/api
+ */
+
 import axios from 'axios';
 import type { MovieResponse, MovieDetail, Credits, User, Review, AuthResponse } from '../types';
 

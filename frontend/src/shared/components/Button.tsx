@@ -1,6 +1,15 @@
+/**
+ * @fileoverview Componente de botón reutilizable
+ * @module shared/components/Button
+ */
+
 import { ButtonHTMLAttributes, forwardRef } from 'react';
 import styles from './Button.module.css';
 
+/**
+ * Props del componente Button.
+ * @interface ButtonProps
+ */
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: 'primary' | 'secondary' | 'ghost';
   size?: 'sm' | 'md' | 'lg';

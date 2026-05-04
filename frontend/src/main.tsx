@@ -1,3 +1,8 @@
+/**
+ * @fileoverview Punto de entrada de la aplicación React
+ * @module main
+ */
+
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import { BrowserRouter } from 'react-router-dom';

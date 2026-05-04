@@ -1,7 +1,16 @@
+/**
+ * @fileoverview Hooks para gestionar películas y detalles de películas
+ * @module shared/hooks/useMovies
+ */
+
 import { useState, useEffect, useCallback } from 'react';
 import { movieApi } from '../utils/api';
 import type { Movie, MovieDetail, Credits, Review } from '../types';
 
+/**
+ * Interfaz retornada por el hook useMovies.
+ * @interface UseMoviesReturn
+ */
 interface UseMoviesReturn {
   movies: Movie[];
   isLoading: boolean;
@@ -12,6 +21,11 @@ interface UseMoviesReturn {
   searchMovies: (query: string, page?: number) => Promise<void>;
 }
 
+/**
+ * Hook que maneja el estado de películas populares y búsqueda.
+ * @function useMovies
+ * @returns {UseMoviesReturn} Objeto con películas, estados y métodos
+ */
 export function useMovies(): UseMoviesReturn {
   const [movies, setMovies] = useState<Movie[]>([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -60,6 +74,10 @@ export function useMovies(): UseMoviesReturn {
   return { movies, isLoading, error, totalPages, totalResults, loadMovies, searchMovies };
 }
 
+/**
+ * Interfaz retornada por el hook useMovieDetail.
+ * @interface UseMovieDetailReturn
+ */
 interface UseMovieDetailReturn {
   movie: MovieDetail | null;
   credits: Credits | null;
@@ -68,6 +86,12 @@ interface UseMovieDetailReturn {
   error: string | null;
 }
 
+/**
+ * Hook que obtiene el detalle de una película específica.
+ * @function useMovieDetail
+ * @param {number} id - ID de la película
+ * @returns {UseMovieDetailReturn} Objeto con detalle, créditos, reseñas y estados
+ */
 export function useMovieDetail(id: number): UseMovieDetailReturn {
   const [movie, setMovie] = useState<MovieDetail | null>(null);
   const [credits, setCredits] = useState<Credits | null>(null);

@@ -1,3 +1,8 @@
+/**
+ * @fileoverview Layout principal con navbar y footer
+ * @module layouts/MainLayout
+ */
+
 import { Outlet } from 'react-router-dom';
 import Navbar from '../shared/components/Navbar';
 import styles from './MainLayout.module.css';

@@ -1,3 +1,8 @@
+/**
+ * @fileoverview Página de películas favoritas del usuario
+ * @module pages/FavoritesPage
+ */
+
 import { useEffect, useState } from 'react';
 import { useAuth } from '../shared/hooks/useAuth';
 import { favoritesApi } from '../shared/utils/api';

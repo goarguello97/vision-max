@@ -1,3 +1,8 @@
+/**
+ * @fileoverview Página de administración del sistema
+ * @module pages/AdminPage
+ */
+
 import { useEffect, useState } from 'react';
 import { useAuth } from '../shared/hooks/useAuth';
 import { adminApi } from '../shared/utils/api';

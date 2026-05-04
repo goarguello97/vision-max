@@ -1,7 +1,16 @@
+/**
+ * @fileoverview Hook para gestionar la autenticación del usuario
+ * @module shared/hooks/useAuth
+ */
+
 import { useState, useEffect, useCallback } from 'react';
 import { authApi } from '../utils/api';
 import type { User } from '../types';
 
+/**
+ * Interfaz retornada por el hook useAuth.
+ * @interface UseAuthReturn
+ */
 interface UseAuthReturn {
   user: User | null;
   isLoading: boolean;
@@ -12,6 +21,12 @@ interface UseAuthReturn {
   refetch: () => Promise<void>;
 }
 
+/**
+ * Hook que maneja el estado de autenticación del usuario.
+ * Provee métodos para login, registro, logout y verificación de sesión.
+ * @function useAuth
+ * @returns {UseAuthReturn} Objeto con estado y métodos de autenticación
+ */
 export function useAuth(): UseAuthReturn {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);

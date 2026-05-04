@@ -1,3 +1,8 @@
+/**
+ * @fileoverview Página principal - Catálogo de películas
+ * @module pages/HomePage
+ */
+
 import { useState } from 'react';
 import { useMovies } from '../shared/hooks/useMovies';
 import MovieCard from '../shared/components/MovieCard';

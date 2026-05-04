@@ -1,3 +1,12 @@
+/**
+ * @fileoverview Definición de tipos de datos de la aplicación
+ * @module shared/types
+ */
+
+/**
+ * Representa un usuario del sistema.
+ * @interface User
+ */
 export interface User {
   id: number;
   email: string;
@@ -6,6 +15,10 @@ export interface User {
   isBanned: boolean;
 }
 
+/**
+ * Representa una película de TMDB.
+ * @interface Movie
+ */
 export interface Movie {
   id: number;
   title: string;
@@ -22,6 +35,10 @@ export interface Movie {
   popularity: number;
 }
 
+/**
+ * Representa el detalle de una película con información extendida.
+ * @interface MovieDetail
+ */
 export interface MovieDetail extends Movie {
   runtime: number | null;
   genres: { id: number; name: string }[];
@@ -32,6 +49,10 @@ export interface MovieDetail extends Movie {
   production_companies: { id: number; name: string }[];
 }
 
+/**
+ * Representa los créditos (reparto y equipo) de una película.
+ * @interface Credits
+ */
 export interface Credits {
   id: number;
   cast: {
@@ -49,6 +70,10 @@ export interface Credits {
   }[];
 }
 
+/**
+ * Respuesta de paginación de lista de películas.
+ * @interface MovieResponse
+ */
 export interface MovieResponse {
   page: number;
   results: Movie[];
@@ -56,6 +81,10 @@ export interface MovieResponse {
   total_results: number;
 }
 
+/**
+ * Representa una reseña de película.
+ * @interface Review
+ */
 export interface Review {
   id: number;
   content: string;
@@ -69,18 +98,30 @@ export interface Review {
   };
 }
 
+/**
+ * Representa una película favorita de un usuario.
+ * @interface Favorite
+ */
 export interface Favorite {
   id: number;
   movieId: number;
   createdAt: string;
 }
 
+/**
+ * Respuesta de autenticación.
+ * @interface AuthResponse
+ */
 export interface AuthResponse {
   success: boolean;
   data?: User;
   message?: string;
 }
 
+/**
+ * Representa un error de la API.
+ * @interface ApiError
+ */
 export interface ApiError {
   success: false;
   message: string;

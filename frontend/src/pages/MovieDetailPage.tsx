@@ -1,3 +1,8 @@
+/**
+ * @fileoverview Página de detalle de película
+ * @module pages/MovieDetailPage
+ */
+
 import { useParams } from 'react-router-dom';
 import { useMovieDetail } from '../shared/hooks/useMovies';
 import { useAuth } from '../shared/hooks/useAuth';
