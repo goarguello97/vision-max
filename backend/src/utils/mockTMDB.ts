@@ -1,3 +1,12 @@
+/**
+ * @fileoverview Datos simulados de TMDB para desarrollo sin API
+ * @module utils/mockTMDB
+ */
+
+/**
+ * Interfaz para película mock básica.
+ * @interface MockMovie
+ */
 export interface MockMovie {
   id: number;
   title: string;
@@ -14,6 +23,10 @@ export interface MockMovie {
   popularity: number;
 }
 
+/**
+ * Interfaz para detalle de película mock.
+ * @interface MockMovieDetail
+ */
 export interface MockMovieDetail extends MockMovie {
   runtime: number | null;
   genres: { id: number; name: string }[];
@@ -24,6 +37,10 @@ export interface MockMovieDetail extends MockMovie {
   production_companies: { id: number; name: string }[];
 }
 
+/**
+ * Interfaz para créditos de película mock.
+ * @interface MockCredits
+ */
 export interface MockCredits {
   id: number;
   cast: {
@@ -216,6 +233,12 @@ export const MOCK_GENRES = [
   { id: 37, name: 'Western' },
 ];
 
+/**
+ * Obtiene el detalle de una película mock por su ID.
+ * @function getMockMovieDetail
+ * @param {number} id - ID de la película
+ * @returns {MockMovieDetail | null} Detalle de la película o null
+ */
 export function getMockMovieDetail(id: number): MockMovieDetail | null {
   const movie = MOCK_MOVIES.find((m) => m.id === id);
   if (!movie) return null;
@@ -238,6 +261,12 @@ export function getMockMovieDetail(id: number): MockMovieDetail | null {
   };
 }
 
+/**
+ * Obtiene los créditos de una película mock.
+ * @function getMockCredits
+ * @param {number} id - ID de la película
+ * @returns {MockCredits} Objeto con elenco y equipo
+ */
 export function getMockCredits(id: number): MockCredits {
   return {
     id,
@@ -253,6 +282,13 @@ export function getMockCredits(id: number): MockCredits {
   };
 }
 
+/**
+ * Obtiene una lista paginada de películas mock.
+ * @function getMockMovies
+ * @param {number} [page=1] - Número de página
+ * @param {number} [limit=20] - Cantidad de películas por página
+ * @returns {Object} Objeto con resultados, total_pages y total_results
+ */
 export function getMockMovies(page: number = 1, limit: number = 20): { results: MockMovie[]; total_pages: number; total_results: number } {
   const start = (page - 1) * limit;
   const end = start + limit;
@@ -265,6 +301,12 @@ export function getMockMovies(page: number = 1, limit: number = 20): { results: 
   };
 }
 
+/**
+ * Busca películas mock por título.
+ * @function searchMockMovies
+ * @param {string} query - Término de búsqueda
+ * @returns {Object} Objeto con resultados, total_pages y total_results
+ */
 export function searchMockMovies(query: string): { results: MockMovie[]; total_pages: number; total_results: number } {
   const lowerQuery = query.toLowerCase();
   const results = MOCK_MOVIES.filter(

@@ -1,8 +1,17 @@
+/**
+ * @fileoverview Middlewares de autenticación y autorización
+ * @module middlewares/authMiddleware
+ */
+
 import { Request, Response, NextFunction } from 'express';
 import { verifyToken } from '../utils/jwt';
 import { UnauthorizedError } from '../utils/AppError';
 import { userRepository } from '../repositories/UserRepository';
 
+/**
+ * Extensión de Request de Express para incluir datos del usuario.
+ * @interface AuthRequest
+ */
 export interface AuthRequest extends Request {
   user?: {
     id: number;
@@ -12,6 +21,14 @@ export interface AuthRequest extends Request {
   };
 }
 
+/**
+ * Middleware que verifica la autenticación del usuario mediante JWT.
+ * @function authMiddleware
+ * @param {AuthRequest} req - Request con cookie de token
+ * @param {Response} res - Response de Express
+ * @param {NextFunction} next - Función next de Express
+ * @throws {UnauthorizedError} Si no hay token o es inválido
+ */
 export const authMiddleware = async (
   req: AuthRequest,
   res: Response,
@@ -48,6 +65,13 @@ export const authMiddleware = async (
   }
 };
 
+/**
+ * Middleware opcional que permite acceso autenticado o anónimo.
+ * @function optionalAuthMiddleware
+ * @param {AuthRequest} req - Request con cookie de token opcional
+ * @param {Response} res - Response de Express
+ * @param {NextFunction} next - Función next de Express
+ */
 export const optionalAuthMiddleware = async (
   req: AuthRequest,
   res: Response,
