@@ -54,6 +54,12 @@ export const authApi = {
 
   me: () =>
     api.get<{ success: boolean; data: User }>('/auth/me'),
+
+  checkUsername: (username: string) =>
+    api.get<{ available: boolean }>('/auth/check-username', { params: { username } }),
+
+  checkEmail: (email: string) =>
+    api.get<{ available: boolean }>('/auth/check-email', { params: { email } }),
 };
 
 export const favoritesApi = {

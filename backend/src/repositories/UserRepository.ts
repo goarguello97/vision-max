@@ -39,6 +39,19 @@ export class UserRepository {
   }
 
   /**
+   * Busca un usuario por su username.
+   * @async
+   * @method findByUsername
+   * @param {string} username - Username del usuario
+   * @returns {Promise<User | null>} Usuario encontrado o null
+   */
+  async findByUsername(username: string): Promise<User | null> {
+    return prisma.user.findUnique({
+      where: { username },
+    });
+  }
+
+  /**
    * Crea un nuevo usuario en la base de datos.
    * @async
    * @method create
