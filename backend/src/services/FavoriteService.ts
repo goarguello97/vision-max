@@ -1,96 +1,52 @@
 /**
- * @fileoverview Servicio de películas favoritas de usuarios
+ * @fileoverview Servicio de favoritos de usuarios (películas y series)
  * @module services/FavoriteService
  */
 
 import { favoriteRepository } from '../repositories/FavoriteRepository';
 import { NotFoundError, ConflictError } from '../utils/AppError';
 import { logger } from '../utils/logger';
+import { MediaType } from '@prisma/client';
 
-/**
- * Servicio que maneja las operaciones de películas favoritas.
- * Permite a los usuarios agregar, eliminar y consultar sus películas favoritas.
- * @class FavoriteService
- */
 export class FavoriteService {
-  /**
-   * Agrega una película a los favoritos del usuario.
-   * @async
-   * @method addFavorite
-   * @param {number} userId - ID del usuario
-   * @param {number} movieId - ID de la película
-   * @returns {Promise<void>}
-   * @throws {ConflictError} Si la película ya está en favoritos
-   */
-  async addFavorite(userId: number, movieId: number): Promise<void> {
-    logger.info('FavoriteService.addFavorite', { userId, movieId });
+  async addFavorite(userId: number, mediaId: number, mediaType: MediaType): Promise<void> {
+    logger.info('FavoriteService.addFavorite', { userId, mediaId, mediaType });
 
-    const existing = await favoriteRepository.findByUserAndMovie(userId, movieId);
+    const existing = await favoriteRepository.findByUserAndMedia(userId, mediaId, mediaType);
     if (existing) {
-      throw new ConflictError('La película ya está en favoritos');
+      throw new ConflictError('Ya está en favoritos');
     }
 
-    await favoriteRepository.create(userId, movieId);
-    logger.info('Favorite added', { userId, movieId });
+    await favoriteRepository.create(userId, mediaId, mediaType);
+    logger.info('Favorite added', { userId, mediaId, mediaType });
   }
 
-  /**
-   * Elimina una película de los favoritos del usuario.
-   * @async
-   * @method removeFavorite
-   * @param {number} userId - ID del usuario
-   * @param {number} movieId - ID de la película
-   * @returns {Promise<void>}
-   * @throws {NotFoundError} Si la película no está en favoritos
-   */
-  async removeFavorite(userId: number, movieId: number): Promise<void> {
-    logger.info('FavoriteService.removeFavorite', { userId, movieId });
+  async removeFavorite(userId: number, mediaId: number, mediaType: MediaType): Promise<void> {
+    logger.info('FavoriteService.removeFavorite', { userId, mediaId, mediaType });
 
-    const existing = await favoriteRepository.findByUserAndMovie(userId, movieId);
+    const existing = await favoriteRepository.findByUserAndMedia(userId, mediaId, mediaType);
     if (!existing) {
-      throw new NotFoundError('Película no encontrada en favoritos');
+      throw new NotFoundError('No encontrado en favoritos');
     }
 
-    await favoriteRepository.delete(userId, movieId);
-    logger.info('Favorite removed', { userId, movieId });
+    await favoriteRepository.delete(userId, mediaId, mediaType);
+    logger.info('Favorite removed', { userId, mediaId, mediaType });
   }
 
-  /**
-   * Obtiene las películas favoritas del usuario con paginación.
-   * @async
-   * @method getFavorites
-   * @param {number} userId - ID del usuario
-   * @param {number} [page=1] - Número de página
-   * @param {number} [limit=20] - Cantidad de resultados por página
-   * @returns {Promise<{favorites: any[], total: number}>} Lista de favoritos y total
-   */
-  async getFavorites(userId: number, page: number = 1, limit: number = 20) {
-    logger.info('FavoriteService.getFavorites', { userId, page });
-
-    return favoriteRepository.findByUser(userId, page, limit);
+  async getFavorites(userId: number, page: number = 1, limit: number = 20, mediaType?: MediaType) {
+    logger.info('FavoriteService.getFavorites', { userId, page, mediaType });
+    return favoriteRepository.findByUser(userId, page, limit, mediaType);
   }
 
-  /**
-   * Obtiene los IDs de todas las películas favoritas del usuario.
-   * @async
-   * @method getUserFavoriteIds
-   * @param {number} userId - ID del usuario
-   * @returns {Promise<number[]>} Array de IDs de películas
-   */
-  async getUserFavoriteIds(userId: number): Promise<number[]> {
+  async getUserFavoriteIds(userId: number, mediaType: MediaType): Promise<number[]> {
+    if (mediaType === 'TV') {
+      return favoriteRepository.getUserFavoriteTv(userId);
+    }
     return favoriteRepository.getUserFavoriteMovies(userId);
   }
 
-  /**
-   * Verifica si una película está en los favoritos del usuario.
-   * @async
-   * @method isFavorite
-   * @param {number} userId - ID del usuario
-   * @param {number} movieId - ID de la película
-   * @returns {Promise<boolean>} true si está en favoritos
-   */
-  async isFavorite(userId: number, movieId: number): Promise<boolean> {
-    const favorite = await favoriteRepository.findByUserAndMovie(userId, movieId);
+  async isFavorite(userId: number, mediaId: number, mediaType: MediaType): Promise<boolean> {
+    const favorite = await favoriteRepository.findByUserAndMedia(userId, mediaId, mediaType);
     return !!favorite;
   }
 }

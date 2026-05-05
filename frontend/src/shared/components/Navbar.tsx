@@ -25,7 +25,8 @@ export default function Navbar() {
         </Link>
 
         <div className={styles.links}>
-          <Link to="/" className={styles.link}>Catálogo</Link>
+          <Link to="/" className={styles.link}>Películas</Link>
+          <Link to="/tv" className={styles.link}>Series TV</Link>
 
           {isAuthenticated && (
             <>

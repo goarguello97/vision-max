@@ -35,13 +35,25 @@ export type LoginInput = z.infer<typeof loginSchema>;
  * @constant {z.ZodObject}
  */
 export const createReviewSchema = z.object({
-  movieId: z.number().int().positive('ID de película inválido'),
+  mediaId: z.number().int().positive('ID de medio inválido'),
+  mediaType: z.enum(['MOVIE', 'TV']),
   content: z.string().min(1, 'Contenido requerido').max(2000, 'Contenido demasiado largo'),
   rating: z.number().int().min(1, 'Rating mínimo 1').max(5, 'Rating máximo 5'),
 });
 
 /** Tipo inferido del esquema de creación de reseña */
 export type CreateReviewInput = z.infer<typeof createReviewSchema>;
+
+/**
+ * Esquema de validación para creación de reseña de TV.
+ * @constant {z.ZodObject}
+ */
+export const createTvReviewSchema = z.object({
+  mediaId: z.number().int().positive('ID de serie inválido'),
+  mediaType: z.literal('TV'),
+  content: z.string().min(1, 'Contenido requerido').max(2000, 'Contenido demasiado largo'),
+  rating: z.number().int().min(1, 'Rating mínimo 1').max(5, 'Rating máximo 5'),
+});
 
 /**
  * Esquema de validación para actualización de reseña.
