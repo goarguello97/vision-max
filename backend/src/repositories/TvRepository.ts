@@ -92,6 +92,20 @@ class TvRepository {
     const response = await tmdbClient.get(`/tv/${tvId}/reviews`);
     return (response as { results: unknown[] }).results;
   }
+
+  async getByIds(ids: number[]): Promise<unknown[]> {
+    logger.info('TvRepository.getByIds', { ids: ids.length, mockMode: config.mockMode });
+
+    if (ids.length === 0) {
+      return [];
+    }
+
+    const results = await Promise.all(
+      ids.map((id) => tmdbClient.get(`/tv/${id}`))
+    );
+
+    return results;
+  }
 }
 
 export const tvRepository = new TvRepository();

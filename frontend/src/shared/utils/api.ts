@@ -86,6 +86,11 @@ export const favoritesApi = {
     return api.get<{ success: boolean; data: { favorites: { mediaId: number; mediaType: MediaType }[]; total: number } }>(`/favorites?${params}`);
   },
 
+  getDetails: (mediaType: MediaType, page = 1, limit = 20) => {
+    const params = new URLSearchParams({ mediaType, page: page.toString(), limit: limit.toString() });
+    return api.get<{ success: boolean; data: { items: unknown[]; total: number; page: number; limit: number } }>(`/favorites/details?${params}`);
+  },
+
   add: (mediaId: number, mediaType: MediaType) =>
     api.post<{ success: boolean }>(`/favorites/${mediaType}/${mediaId}`),
 

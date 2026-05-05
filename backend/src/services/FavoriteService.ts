@@ -4,6 +4,8 @@
  */
 
 import { favoriteRepository } from '../repositories/FavoriteRepository';
+import { movieRepository } from '../repositories/MovieRepository';
+import { tvRepository } from '../repositories/TvRepository';
 import { NotFoundError, ConflictError } from '../utils/AppError';
 import { logger } from '../utils/logger';
 import { MediaType } from '@prisma/client';
@@ -36,6 +38,27 @@ export class FavoriteService {
   async getFavorites(userId: number, page: number = 1, limit: number = 20, mediaType?: MediaType) {
     logger.info('FavoriteService.getFavorites', { userId, page, mediaType });
     return favoriteRepository.findByUser(userId, page, limit, mediaType);
+  }
+
+  async getFavoritesWithDetails(userId: number, mediaType: MediaType, page: number = 1, limit: number = 20) {
+    logger.info('FavoriteService.getFavoritesWithDetails', { userId, mediaType, page });
+
+    const { favorites, total } = await favoriteRepository.findByUser(userId, page, limit, mediaType);
+
+    if (favorites.length === 0) {
+      return { items: [], total, page, limit };
+    }
+
+    const mediaIds = favorites.map((f) => f.mediaId);
+
+    let items: unknown[];
+    if (mediaType === 'MOVIE') {
+      items = await movieRepository.getByIds(mediaIds);
+    } else {
+      items = await tvRepository.getByIds(mediaIds);
+    }
+
+    return { items, total, page, limit };
   }
 
   async getUserFavoriteIds(userId: number, mediaType: MediaType): Promise<number[]> {

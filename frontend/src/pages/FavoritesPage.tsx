@@ -1,5 +1,5 @@
 /**
- * @fileoverview Página de películas favoritas del usuario
+ * @fileoverview Página de favoritos del usuario
  * @module pages/FavoritesPage
  */
 
@@ -7,26 +7,44 @@ import { useEffect, useState } from 'react';
 import { useAuth } from '../shared/hooks/useAuth';
 import { favoritesApi } from '../shared/utils/api';
 import MovieCard from '../shared/components/MovieCard';
-import type { Movie } from '../shared/types';
+import TvCard from '../shared/components/TvCard';
+import type { Movie, TvShow, MediaType } from '../shared/types';
 import styles from './FavoritesPage.module.css';
+
+type TabType = 'MOVIE' | 'TV';
 
 export default function FavoritesPage() {
   const { isAuthenticated } = useAuth();
+  const [activeTab, setActiveTab] = useState<TabType>('MOVIE');
   const [movies, setMovies] = useState<Movie[]>([]);
+  const [tvShows, setTvShows] = useState<TvShow[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [total, setTotal] = useState(0);
 
   useEffect(() => {
     if (isAuthenticated) {
-      favoritesApi.getAll()
-        .then(() => {
-          // Por ahora solo obtenemos los IDs de favoritos
-          // En una implementación real, necesitaríamos obtener los detalles de cada película
-          setMovies([]);
+      setIsLoading(true);
+      favoritesApi.getDetails(activeTab)
+        .then((res) => {
+          if (res.data.success) {
+            if (activeTab === 'MOVIE') {
+              setMovies(res.data.data.items as Movie[]);
+            } else {
+              setTvShows(res.data.data.items as TvShow[]);
+            }
+            setTotal(res.data.data.total);
+          }
         })
-        .catch(() => setMovies([]))
+        .catch(() => {
+          if (activeTab === 'MOVIE') {
+            setMovies([]);
+          } else {
+            setTvShows([]);
+          }
+        })
         .finally(() => setIsLoading(false));
     }
-  }, [isAuthenticated]);
+  }, [isAuthenticated, activeTab]);
 
   if (!isAuthenticated) {
     return (
@@ -41,16 +59,41 @@ export default function FavoritesPage() {
     <div className={styles.page}>
       <h1 className={styles.title}>Mis Favoritos</h1>
 
+      <div className={styles.tabs}>
+        <button
+          className={`${styles.tab} ${activeTab === 'MOVIE' ? styles.active : ''}`}
+          onClick={() => setActiveTab('MOVIE')}
+        >
+          Películas
+        </button>
+        <button
+          className={`${styles.tab} ${activeTab === 'TV' ? styles.active : ''}`}
+          onClick={() => setActiveTab('TV')}
+        >
+          Series TV
+        </button>
+      </div>
+
       {isLoading ? (
         <div className={styles.loading}>Cargando...</div>
-      ) : movies.length === 0 ? (
+      ) : activeTab === 'MOVIE' && movies.length === 0 ? (
         <div className={styles.empty}>
           <p>No tienes películas en favoritos aún</p>
         </div>
-      ) : (
+      ) : activeTab === 'TV' && tvShows.length === 0 ? (
+        <div className={styles.empty}>
+          <p>No tienes series en favoritos aún</p>
+        </div>
+      ) : activeTab === 'MOVIE' ? (
         <div className={styles.grid}>
           {movies.map((movie) => (
             <MovieCard key={movie.id} movie={movie} />
+          ))}
+        </div>
+      ) : (
+        <div className={styles.grid}>
+          {tvShows.map((tvShow) => (
+            <TvCard key={tvShow.id} tvShow={tvShow} />
           ))}
         </div>
       )}

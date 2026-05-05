@@ -13,6 +13,8 @@ router.use(authMiddleware);
 
 router.get('/', favoriteController.getFavorites);
 
+router.get('/details', favoriteController.getFavoritesWithDetails);
+
 router.post('/:mediaType/:mediaId', favoriteController.addFavorite);
 
 router.delete('/:mediaType/:mediaId', favoriteController.removeFavorite);
