@@ -108,4 +108,58 @@ router.post('/logout', authController.logout);
  */
 router.get('/me', authMiddleware, authController.me);
 
+/**
+ * @swagger
+ * /auth/check-username:
+ *   get:
+ *     tags: [Authentication]
+ *     summary: Check if username is available
+ *     description: Checks if a username is already taken
+ *     parameters:
+ *       - in: query
+ *         name: username
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: Username to check
+ *     responses:
+ *       200:
+ *         description: Availability status
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 available:
+ *                   type: boolean
+ */
+router.get('/check-username', authController.checkUsername);
+
+/**
+ * @swagger
+ * /auth/check-email:
+ *   get:
+ *     tags: [Authentication]
+ *     summary: Check if email is available
+ *     description: Checks if an email is already registered
+ *     parameters:
+ *       - in: query
+ *         name: email
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: Email to check
+ *     responses:
+ *       200:
+ *         description: Availability status
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 available:
+ *                   type: boolean
+ */
+router.get('/check-email', authController.checkEmail);
+
 export default router;

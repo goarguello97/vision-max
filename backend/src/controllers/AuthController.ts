@@ -5,6 +5,7 @@
 
 import { Request, Response } from 'express';
 import { authService } from '../services/AuthService';
+import { userRepository } from '../repositories/UserRepository';
 import { registerSchema, loginSchema } from '../models/schemas';
 import { ZodError } from 'zod';
 import { AppError } from '../utils/AppError';
@@ -132,6 +133,58 @@ export class AuthController {
     res.json({
       success: true,
       data: result,
+    });
+  }
+
+  /**
+   * Verifica si un username está disponible.
+   * @async
+   * @method checkUsername
+   * @param {Request} req - Solicitud HTTP con query username
+   * @param {Response} res - Respuesta HTTP
+   * @returns {Promise<void>}
+   */
+  async checkUsername(req: Request, res: Response): Promise<void> {
+    const { username } = req.query;
+
+    if (!username || typeof username !== 'string') {
+      res.status(400).json({
+        success: false,
+        message: 'Username parameter is required',
+      });
+      return;
+    }
+
+    const exists = await userRepository.findByUsername(username);
+
+    res.json({
+      available: !exists,
+    });
+  }
+
+  /**
+   * Verifica si un email está disponible.
+   * @async
+   * @method checkEmail
+   * @param {Request} req - Solicitud HTTP con query email
+   * @param {Response} res - Respuesta HTTP
+   * @returns {Promise<void>}
+   */
+  async checkEmail(req: Request, res: Response): Promise<void> {
+    const { email } = req.query;
+
+    if (!email || typeof email !== 'string') {
+      res.status(400).json({
+        success: false,
+        message: 'Email parameter is required',
+      });
+      return;
+    }
+
+    const exists = await userRepository.findByEmail(email);
+
+    res.json({
+      available: !exists,
     });
   }
 }

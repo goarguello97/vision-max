@@ -16,7 +16,7 @@ model User {
   id           Int        @id @default(autoincrement())
   email        String     @unique
   passwordHash String
-  username     String
+  username     String     @unique
   role         Role       @default(USER)
   isBanned     Boolean    @default(false)
   createdAt    DateTime   @default(now())

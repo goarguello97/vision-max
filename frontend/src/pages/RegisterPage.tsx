@@ -9,6 +9,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useAuth } from '../shared/hooks/useAuth';
+import { authApi } from '../shared/utils/api';
 import Button from '../shared/components/Button';
 import styles from './AuthPage.module.css';
 
@@ -26,10 +27,49 @@ export default function RegisterPage() {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [usernameError, setUsernameError] = useState('');
+  const [isCheckingUsername, setIsCheckingUsername] = useState(false);
+  const [emailError, setEmailError] = useState('');
+  const [isCheckingEmail, setIsCheckingEmail] = useState(false);
 
-  const { register, handleSubmit, formState: { errors } } = useForm<RegisterForm>({
+  const { register: formRegister, handleSubmit, formState: { errors } } = useForm<RegisterForm>({
     resolver: zodResolver(registerSchema),
   });
+
+  const checkUsername = async (username: string) => {
+    if (username.length < 3) return;
+    setIsCheckingUsername(true);
+    try {
+      const response = await authApi.checkUsername(username);
+      if (!response.data.available) {
+        setUsernameError('El nombre de usuario ya está en uso');
+      } else {
+        setUsernameError('');
+      }
+    } catch {
+      setUsernameError('');
+    } finally {
+      setIsCheckingUsername(false);
+    }
+  };
+
+  const checkEmail = async (email: string) => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) return;
+    setIsCheckingEmail(true);
+    try {
+      const response = await authApi.checkEmail(email);
+      if (!response.data.available) {
+        setEmailError('El email ya está registrado');
+      } else {
+        setEmailError('');
+      }
+    } catch {
+      setEmailError('');
+    } finally {
+      setIsCheckingEmail(false);
+    }
+  };
 
   const onSubmit = async (data: RegisterForm) => {
     setIsLoading(true);
@@ -74,10 +114,13 @@ export default function RegisterPage() {
             <input
               id="username"
               type="text"
-              {...register('username')}
+              {...formRegister('username')}
+              onBlur={(e) => checkUsername(e.target.value)}
               className={styles.input}
               placeholder="tuusuario"
             />
+            {isCheckingUsername && <span className={styles.fieldError}>Verificando...</span>}
+            {usernameError && <span className={styles.fieldError}>{usernameError}</span>}
             {errors.username && <span className={styles.fieldError}>{errors.username.message}</span>}
           </div>
 
@@ -86,10 +129,13 @@ export default function RegisterPage() {
             <input
               id="email"
               type="email"
-              {...register('email')}
+              {...formRegister('email')}
+              onBlur={(e) => checkEmail(e.target.value)}
               className={styles.input}
               placeholder="tu@email.com"
             />
+            {isCheckingEmail && <span className={styles.fieldError}>Verificando...</span>}
+            {emailError && <span className={styles.fieldError}>{emailError}</span>}
             {errors.email && <span className={styles.fieldError}>{errors.email.message}</span>}
           </div>
 
@@ -98,7 +144,7 @@ export default function RegisterPage() {
             <input
               id="password"
               type="password"
-              {...register('password')}
+              {...formRegister('password')}
               className={styles.input}
               placeholder="••••••••"
             />

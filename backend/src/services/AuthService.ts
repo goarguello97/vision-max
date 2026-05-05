@@ -28,9 +28,14 @@ export class AuthService {
   async register(input: RegisterInput): Promise<AuthUser> {
     logger.info('AuthService.register', { email: input.email });
 
-    const existingUser = await userRepository.findByEmail(input.email);
-    if (existingUser) {
+    const existingEmail = await userRepository.findByEmail(input.email);
+    if (existingEmail) {
       throw new ConflictError('El email ya está registrado');
+    }
+
+    const existingUsername = await userRepository.findByUsername(input.username);
+    if (existingUsername) {
+      throw new ConflictError('El nombre de usuario ya está en uso');
     }
 
     const passwordHash = await hashPassword(input.password);
