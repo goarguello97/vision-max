@@ -18,12 +18,13 @@ const IMAGE_BASE_URL = import.meta.env.VITE_TMDB_IMAGE_URL || 'https://image.tmd
 export default function TvDetailPage() {
   const { id } = useParams<{ id: string }>();
   const tvId = Number(id);
-  const { tv, credits, reviews, isLoading, error } = useTvDetail(tvId);
+  const { tv, credits, isLoading, error } = useTvDetail(tvId);
   const { isAuthenticated, user } = useAuth();
   const [isFavorite, setIsFavorite] = useState(false);
   const [favoriteLoading, setFavoriteLoading] = useState(false);
   const [userReview, setUserReview] = useState<Review | null>(null);
   const [showReviewForm, setShowReviewForm] = useState(false);
+  const [localReviews, setLocalReviews] = useState<Review[]>([]);
   const reviewsRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -40,8 +41,18 @@ export default function TvDetailPage() {
           setUserReview(res.data.data);
         }
       });
+
+      loadLocalReviews();
     }
   }, [isAuthenticated, user, tvId]);
+
+  const loadLocalReviews = () => {
+    reviewsApi.getByMedia(tvId, 'TV').then((res) => {
+      if (res.data.success) {
+        setLocalReviews(res.data.data.reviews);
+      }
+    });
+  };
 
   const handleToggleFavorite = async () => {
     if (!isAuthenticated) return;
@@ -71,6 +82,7 @@ export default function TvDetailPage() {
   const handleReviewSuccess = (review: Review) => {
     setUserReview(review);
     setShowReviewForm(false);
+    loadLocalReviews();
   };
 
   const handleCancelReview = () => {
@@ -202,22 +214,22 @@ export default function TvDetailPage() {
             </div>
           )}
 
-          {(showReviewForm || userReview) && (
+          {showReviewForm && (
             <div ref={reviewsRef}>
               <ReviewForm
                 mediaId={tvId}
                 mediaType="TV"
                 initialReview={userReview}
                 onSuccess={handleReviewSuccess}
-                onCancel={userReview ? handleCancelReview : undefined}
+                onCancel={handleCancelReview}
               />
             </div>
           )}
 
-          {reviews && reviews.length > 0 && (
+          {localReviews.length > 0 && (
             <div className={styles.reviews}>
               <h3>Reseñas</h3>
-              {reviews.map((review) => (
+              {localReviews.map((review) => (
                 <div key={review.id} className={styles.review}>
                   <div className={styles.reviewHeader}>
                     <span className={styles.reviewUser}>{review.user.username}</span>
