@@ -3,7 +3,7 @@
  * @module pages/RegisterPage
  */
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -24,6 +24,7 @@ export default function RegisterPage() {
   const navigate = useNavigate();
   const { register: registerUser } = useAuth();
   const [error, setError] = useState('');
+  const [success, setSuccess] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
   const { register, handleSubmit, formState: { errors } } = useForm<RegisterForm>({
@@ -33,15 +34,30 @@ export default function RegisterPage() {
   const onSubmit = async (data: RegisterForm) => {
     setIsLoading(true);
     setError('');
+    setSuccess('');
     try {
       await registerUser(data.email, data.password, data.username);
-      navigate('/');
-    } catch (err) {
-      setError('Error al registrarse');
+      setSuccess('Registro exitoso. Redirigiendo al login...');
+      setTimeout(() => navigate('/login'), 2000);
+    } catch (err: any) {
+      console.error('Registration error:', err);
+      const backendMessage =
+        err?.response?.data?.message ||
+        err?.response?.data?.error ||
+        err?.message ||
+        'Error al registrarse';
+      setError(backendMessage);
     } finally {
       setIsLoading(false);
     }
   };
+
+  useEffect(() => {
+    return () => {
+      setSuccess('');
+      setError('');
+    };
+  }, []);
 
   return (
     <div className={styles.authPage}>
@@ -50,6 +66,7 @@ export default function RegisterPage() {
         <p className={styles.subtitle}>Únete a la comunidad</p>
 
         {error && <div className={styles.error}>{error}</div>}
+        {success && <div className={styles.success}>{success}</div>}
 
         <form onSubmit={handleSubmit(onSubmit)} className={styles.form}>
           <div className={styles.field}>

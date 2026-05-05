@@ -32,44 +32,51 @@ export const errorHandler = (
   res: Response,
   _next: NextFunction
 ): void => {
-  if (err instanceof AppError) {
+  try {
+    if (err instanceof AppError) {
+      const response: ErrorResponse = {
+        status: 'error',
+        message: err.message,
+        code: err.code,
+      };
+
+      if (process.env.NODE_ENV === 'development') {
+        response.stack = err.stack;
+      }
+
+      logger.warn(`Operational Error: ${err.message}`, {
+        path: req.path,
+        method: req.method,
+        statusCode: err.statusCode,
+      });
+
+      res.status(err.statusCode).json(response);
+      return;
+    }
+
+    logger.error('Unexpected Error', {
+      path: req.path,
+      method: req.method,
+      error: err.message,
+      stack: err.stack,
+    });
+
     const response: ErrorResponse = {
       status: 'error',
-      message: err.message,
-      code: err.code,
+      message: process.env.NODE_ENV === 'development' ? err.message : 'Error interno del servidor',
     };
 
     if (process.env.NODE_ENV === 'development') {
       response.stack = err.stack;
     }
 
-    logger.warn(`Operational Error: ${err.message}`, {
-      path: req.path,
-      method: req.method,
-      statusCode: err.statusCode,
-    });
-
-    res.status(err.statusCode).json(response);
-    return;
+    res.status(500).json(response);
+  } catch (handlerError) {
+    console.error('Error handler failed:', handlerError);
+    if (!res.headersSent) {
+      res.status(500).json({ status: 'error', message: 'Error interno del servidor' });
+    }
   }
-
-  logger.error('Unexpected Error', {
-    path: req.path,
-    method: req.method,
-    error: err.message,
-    stack: err.stack,
-  });
-
-  const response: ErrorResponse = {
-    status: 'error',
-    message: process.env.NODE_ENV === 'development' ? err.message : 'Error interno del servidor',
-  };
-
-  if (process.env.NODE_ENV === 'development') {
-    response.stack = err.stack;
-  }
-
-  res.status(500).json(response);
 };
 
 /**

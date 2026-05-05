@@ -7,6 +7,7 @@ import { Request, Response } from 'express';
 import { authService } from '../services/AuthService';
 import { registerSchema, loginSchema } from '../models/schemas';
 import { ZodError } from 'zod';
+import { AppError } from '../utils/AppError';
 import { logger } from '../utils/logger';
 import config from '../config';
 
@@ -49,6 +50,14 @@ export class AuthController {
         });
         return;
       }
+      if (error instanceof AppError) {
+        res.status(error.statusCode).json({
+          status: 'error',
+          message: error.message,
+          code: error.code,
+        });
+        return;
+      }
       throw error;
     }
   }
@@ -84,6 +93,14 @@ export class AuthController {
           success: false,
           message: 'Validation error',
           errors: error.errors,
+        });
+        return;
+      }
+      if (error instanceof AppError) {
+        res.status(error.statusCode).json({
+          status: 'error',
+          message: error.message,
+          code: error.code,
         });
         return;
       }

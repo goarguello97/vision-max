@@ -14,6 +14,20 @@ const api = axios.create({
   },
 });
 
+api.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error.response) {
+      return Promise.reject(error);
+    }
+    if (error.request) {
+      const networkError = new Error('Error de conexión con el servidor');
+      return Promise.reject(networkError);
+    }
+    return Promise.reject(error);
+  }
+);
+
 export const movieApi = {
   getPopular: (page = 1) =>
     api.get<{ success: boolean; data: MovieResponse }>(`/movies?page=${page}`),
