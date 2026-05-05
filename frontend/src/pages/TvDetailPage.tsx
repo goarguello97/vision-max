@@ -3,12 +3,14 @@
  * @module pages/TvDetailPage
  */
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useParams } from 'react-router-dom';
 import { useTvDetail } from '../shared/hooks/useTvShows';
 import { useAuth } from '../shared/hooks/useAuth';
-import { favoritesApi } from '../shared/utils/api';
+import { favoritesApi, reviewsApi } from '../shared/utils/api';
 import Button from '../shared/components/Button';
+import ReviewForm from '../shared/components/ReviewForm';
+import type { Review } from '../shared/types';
 import styles from './TvDetailPage.module.css';
 
 const IMAGE_BASE_URL = import.meta.env.VITE_TMDB_IMAGE_URL || 'https://image.tmdb.org/t/p';
@@ -20,6 +22,9 @@ export default function TvDetailPage() {
   const { isAuthenticated, user } = useAuth();
   const [isFavorite, setIsFavorite] = useState(false);
   const [favoriteLoading, setFavoriteLoading] = useState(false);
+  const [userReview, setUserReview] = useState<Review | null>(null);
+  const [showReviewForm, setShowReviewForm] = useState(false);
+  const reviewsRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (isAuthenticated && user && tvId) {
@@ -27,6 +32,12 @@ export default function TvDetailPage() {
         if (res.data.success) {
           const ids = res.data.data.favorites.map((f) => f.mediaId);
           setIsFavorite(ids.includes(tvId));
+        }
+      });
+
+      reviewsApi.getUserReviewForMedia(tvId, 'TV').then((res) => {
+        if (res.data.success && res.data.data) {
+          setUserReview(res.data.data);
         }
       });
     }
@@ -48,6 +59,22 @@ export default function TvDetailPage() {
     } finally {
       setFavoriteLoading(false);
     }
+  };
+
+  const handleWriteReview = () => {
+    setShowReviewForm(true);
+    setTimeout(() => {
+      reviewsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 100);
+  };
+
+  const handleReviewSuccess = (review: Review) => {
+    setUserReview(review);
+    setShowReviewForm(false);
+  };
+
+  const handleCancelReview = () => {
+    setShowReviewForm(false);
   };
 
   if (isLoading) {
@@ -132,7 +159,9 @@ export default function TvDetailPage() {
                 >
                   {isFavorite ? 'Quitar de Favoritos' : 'Agregar a Favoritos'}
                 </Button>
-                <Button variant="secondary">Escribir Reseña</Button>
+                <Button variant="secondary" onClick={handleWriteReview}>
+                  {userReview ? 'Editar Reseña' : 'Escribir Reseña'}
+                </Button>
               </>
             )}
           </div>
@@ -170,6 +199,18 @@ export default function TvDetailPage() {
                   </div>
                 ))}
               </div>
+            </div>
+          )}
+
+          {(showReviewForm || userReview) && (
+            <div ref={reviewsRef}>
+              <ReviewForm
+                mediaId={tvId}
+                mediaType="TV"
+                initialReview={userReview}
+                onSuccess={handleReviewSuccess}
+                onCancel={userReview ? handleCancelReview : undefined}
+              />
             </div>
           )}
 

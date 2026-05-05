@@ -110,6 +110,9 @@ export const reviewsApi = {
 
   getByMedia: (mediaId: number, mediaType: MediaType, page = 1) =>
     api.get<{ success: boolean; data: { reviews: Review[]; total: number } }>(`/reviews/${mediaType}/${mediaId}?page=${page}`),
+
+  getUserReviewForMedia: (mediaId: number, mediaType: MediaType) =>
+    api.get<{ success: boolean; data: Review | null }>(`/reviews/user/${mediaType}/${mediaId}`),
 };
 
 export const adminApi = {

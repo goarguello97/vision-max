@@ -17,4 +17,6 @@ router.delete('/:id', authMiddleware, reviewController.delete);
 
 router.get('/:mediaType/:mediaId', reviewController.getByMedia);
 
+router.get('/user/:mediaType/:mediaId', authMiddleware, reviewController.getUserReviewForMedia);
+
 export default router;
