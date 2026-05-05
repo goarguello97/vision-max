@@ -28,18 +28,11 @@ export class AuthController {
     try {
       const input = registerSchema.parse(req.body);
 
-      const result = await authService.register(input);
-
-      res.cookie('token', result.token, {
-        httpOnly: true,
-        secure: config.nodeEnv === 'production',
-        sameSite: 'strict',
-        maxAge: 7 * 24 * 60 * 60 * 1000,
-      });
+      const user = await authService.register(input);
 
       res.status(201).json({
         success: true,
-        data: result.user,
+        data: user,
       });
     } catch (error) {
       if (error instanceof ZodError) {

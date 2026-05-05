@@ -22,10 +22,10 @@ export class AuthService {
    * @async
    * @method register
    * @param {RegisterInput} input - Datos de registro del usuario
-   * @returns {Promise<{user: AuthUser, token: string}>} Usuario creado y token JWT
+   * @returns {Promise<AuthUser>} Usuario creado
    * @throws {ConflictError} Si el email ya está registrado
    */
-  async register(input: RegisterInput): Promise<{ user: AuthUser; token: string }> {
+  async register(input: RegisterInput): Promise<AuthUser> {
     logger.info('AuthService.register', { email: input.email });
 
     const existingUser = await userRepository.findByEmail(input.email);
@@ -41,26 +41,14 @@ export class AuthService {
       username: input.username,
     });
 
-    const payload: UserPayload = {
+    logger.info('User registered successfully', { userId: user.id });
+
+    return {
       id: user.id,
       email: user.email,
       username: user.username,
       role: user.role,
-    };
-
-    const token = generateToken(payload);
-
-    logger.info('User registered successfully', { userId: user.id });
-
-    return {
-      user: {
-        id: user.id,
-        email: user.email,
-        username: user.username,
-        role: user.role,
-        isBanned: user.isBanned,
-      },
-      token,
+      isBanned: user.isBanned,
     };
   }
 

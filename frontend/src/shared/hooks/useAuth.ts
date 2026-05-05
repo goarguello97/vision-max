@@ -61,9 +61,7 @@ export function useAuth(): UseAuthReturn {
 
   const register = async (email: string, password: string, username: string) => {
     const response = await authApi.register({ email, password, username });
-    if (response.data.success && response.data.data) {
-      setUser(response.data.data);
-    } else {
+    if (!response.data.success) {
       throw new Error(response.data.message || 'Registration failed');
     }
   };
