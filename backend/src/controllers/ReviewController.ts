@@ -105,6 +105,30 @@ export class ReviewController {
       next(error);
     }
   }
+
+  async getUserReviewForMedia(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const user = (req as unknown as { user: { id: number } }).user;
+      const mediaId = parseInt(req.params.mediaId, 10);
+      const mediaType = req.params.mediaType as MediaType;
+
+      if (isNaN(mediaId)) {
+        res.status(400).json({ success: false, message: 'ID inválido' });
+        return;
+      }
+
+      if (!['MOVIE', 'TV'].includes(mediaType)) {
+        res.status(400).json({ success: false, message: 'Tipo de medio inválido' });
+        return;
+      }
+
+      const review = await reviewService.getUserReviewForMedia(user.id, mediaId, mediaType);
+
+      res.json({ success: true, data: review });
+    } catch (error) {
+      next(error);
+    }
+  }
 }
 
 export const reviewController = new ReviewController();

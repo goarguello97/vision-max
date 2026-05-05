@@ -3,12 +3,14 @@
  * @module pages/TvDetailPage
  */
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useParams } from 'react-router-dom';
 import { useTvDetail } from '../shared/hooks/useTvShows';
 import { useAuth } from '../shared/hooks/useAuth';
-import { favoritesApi } from '../shared/utils/api';
+import { favoritesApi, reviewsApi } from '../shared/utils/api';
 import Button from '../shared/components/Button';
+import ReviewForm from '../shared/components/ReviewForm';
+import type { Review } from '../shared/types';
 import styles from './TvDetailPage.module.css';
 
 const IMAGE_BASE_URL = import.meta.env.VITE_TMDB_IMAGE_URL || 'https://image.tmdb.org/t/p';
@@ -16,10 +18,14 @@ const IMAGE_BASE_URL = import.meta.env.VITE_TMDB_IMAGE_URL || 'https://image.tmd
 export default function TvDetailPage() {
   const { id } = useParams<{ id: string }>();
   const tvId = Number(id);
-  const { tv, credits, reviews, isLoading, error } = useTvDetail(tvId);
+  const { tv, credits, isLoading, error } = useTvDetail(tvId);
   const { isAuthenticated, user } = useAuth();
   const [isFavorite, setIsFavorite] = useState(false);
   const [favoriteLoading, setFavoriteLoading] = useState(false);
+  const [userReview, setUserReview] = useState<Review | null>(null);
+  const [showReviewForm, setShowReviewForm] = useState(false);
+  const [localReviews, setLocalReviews] = useState<Review[]>([]);
+  const reviewsRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (isAuthenticated && user && tvId) {
@@ -29,8 +35,24 @@ export default function TvDetailPage() {
           setIsFavorite(ids.includes(tvId));
         }
       });
+
+      reviewsApi.getUserReviewForMedia(tvId, 'TV').then((res) => {
+        if (res.data.success && res.data.data) {
+          setUserReview(res.data.data);
+        }
+      });
+
+      loadLocalReviews();
     }
   }, [isAuthenticated, user, tvId]);
+
+  const loadLocalReviews = () => {
+    reviewsApi.getByMedia(tvId, 'TV').then((res) => {
+      if (res.data.success) {
+        setLocalReviews(res.data.data.reviews);
+      }
+    });
+  };
 
   const handleToggleFavorite = async () => {
     if (!isAuthenticated) return;
@@ -48,6 +70,23 @@ export default function TvDetailPage() {
     } finally {
       setFavoriteLoading(false);
     }
+  };
+
+  const handleWriteReview = () => {
+    setShowReviewForm(true);
+    setTimeout(() => {
+      reviewsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 100);
+  };
+
+  const handleReviewSuccess = (review: Review) => {
+    setUserReview(review);
+    setShowReviewForm(false);
+    loadLocalReviews();
+  };
+
+  const handleCancelReview = () => {
+    setShowReviewForm(false);
   };
 
   if (isLoading) {
@@ -132,7 +171,9 @@ export default function TvDetailPage() {
                 >
                   {isFavorite ? 'Quitar de Favoritos' : 'Agregar a Favoritos'}
                 </Button>
-                <Button variant="secondary">Escribir Reseña</Button>
+                <Button variant="secondary" onClick={handleWriteReview}>
+                  {userReview ? 'Editar Reseña' : 'Escribir Reseña'}
+                </Button>
               </>
             )}
           </div>
@@ -173,10 +214,22 @@ export default function TvDetailPage() {
             </div>
           )}
 
-          {reviews && reviews.length > 0 && (
+          {showReviewForm && (
+            <div ref={reviewsRef}>
+              <ReviewForm
+                mediaId={tvId}
+                mediaType="TV"
+                initialReview={userReview}
+                onSuccess={handleReviewSuccess}
+                onCancel={handleCancelReview}
+              />
+            </div>
+          )}
+
+          {localReviews.length > 0 && (
             <div className={styles.reviews}>
               <h3>Reseñas</h3>
-              {reviews.map((review) => (
+              {localReviews.map((review) => (
                 <div key={review.id} className={styles.review}>
                   <div className={styles.reviewHeader}>
                     <span className={styles.reviewUser}>{review.user.username}</span>

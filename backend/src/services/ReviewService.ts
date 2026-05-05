@@ -87,6 +87,11 @@ export class ReviewService {
 
     return reviewRepository.toggleHidden(reviewId, isHidden);
   }
+
+  async getUserReviewForMedia(userId: number, mediaId: number, mediaType: MediaType) {
+    logger.info('ReviewService.getUserReviewForMedia', { userId, mediaId, mediaType });
+    return reviewRepository.findByUserAndMedia(userId, mediaId, mediaType);
+  }
 }
 
 export const reviewService = new ReviewService();
