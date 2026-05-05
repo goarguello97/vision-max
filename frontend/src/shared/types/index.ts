@@ -4,6 +4,11 @@
  */
 
 /**
+ * Tipo de medio para favoritos y reseñas.
+ */
+export type MediaType = 'MOVIE' | 'TV';
+
+/**
  * Representa un usuario del sistema.
  * @interface User
  */
@@ -82,11 +87,79 @@ export interface MovieResponse {
 }
 
 /**
- * Representa una reseña de película.
+ * Representa una serie de TV de TMDB.
+ * @interface TvShow
+ */
+export interface TvShow {
+  id: number;
+  name: string;
+  overview: string;
+  poster_path: string | null;
+  backdrop_path: string | null;
+  first_air_date: string;
+  vote_average: number;
+  vote_count: number;
+  genre_ids: number[];
+  original_language: string;
+  original_name: string;
+  popularity: number;
+}
+
+/**
+ * Representa el detalle de una serie de TV.
+ * @interface TvShowDetail
+ */
+export interface TvShowDetail extends TvShow {
+  genres: { id: number; name: string }[];
+  tagline: string | null;
+  episode_run_time: number[];
+  number_of_seasons: number;
+  number_of_episodes: number;
+  status: string;
+  created_by: { id: number; name: string }[];
+  networks: { id: number; name: string; logo_path: string | null }[];
+}
+
+/**
+ * Representa los créditos de una serie de TV.
+ * @interface TvCredits
+ */
+export interface TvCredits {
+  id: number;
+  cast: {
+    id: number;
+    name: string;
+    character: string;
+    profile_path: string | null;
+    order: number;
+  }[];
+  crew: {
+    id: number;
+    name: string;
+    job: string;
+    department: string;
+  }[];
+}
+
+/**
+ * Respuesta de paginación de series de TV.
+ * @interface TvResponse
+ */
+export interface TvResponse {
+  page: number;
+  results: TvShow[];
+  total_pages: number;
+  total_results: number;
+}
+
+/**
+ * Representa una reseña.
  * @interface Review
  */
 export interface Review {
   id: number;
+  mediaId: number;
+  mediaType: MediaType;
   content: string;
   rating: number;
   isHidden: boolean;
@@ -99,12 +172,13 @@ export interface Review {
 }
 
 /**
- * Representa una película favorita de un usuario.
+ * Representa un favorito.
  * @interface Favorite
  */
 export interface Favorite {
   id: number;
-  movieId: number;
+  mediaId: number;
+  mediaType: MediaType;
   createdAt: string;
 }
 
@@ -126,4 +200,13 @@ export interface ApiError {
   success: false;
   message: string;
   errors?: { field: string; message: string }[];
+}
+
+/**
+ * Respuesta de búsqueda unificada.
+ * @interface SearchAllResponse
+ */
+export interface SearchAllResponse {
+  movies: MovieResponse;
+  tv: TvResponse;
 }

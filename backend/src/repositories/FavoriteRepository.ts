@@ -4,21 +4,17 @@
  */
 
 import prisma from '../database/client';
+import { MediaType } from '@prisma/client';
 
 /**
- * Interfaz de favorito con información de la película.
- * @interface FavoriteWithMovie
+ * Interfaz de favorito con información del medio.
+ * @interface FavoriteWithMedia
  */
-interface FavoriteWithMovie {
+interface FavoriteWithMedia {
   id: number;
-  movieId: number;
+  mediaId: number;
+  mediaType: MediaType;
   createdAt: Date;
-  movie?: {
-    id: number;
-    title: string;
-    poster_path: string | null;
-    vote_average: number;
-  };
 }
 
 /**
@@ -27,19 +23,21 @@ interface FavoriteWithMovie {
  */
 export class FavoriteRepository {
   /**
-   * Busca un favorito por usuario y película.
+   * Busca un favorito por usuario, medio y tipo.
    * @async
-   * @method findByUserAndMovie
+   * @method findByUserAndMedia
    * @param {number} userId - ID del usuario
-   * @param {number} movieId - ID de la película
+   * @param {number} mediaId - ID del medio
+   * @param {MediaType} mediaType - Tipo de medio (MOVIE o TV)
    * @returns {Promise<Favorite | null>} Favorito encontrado o null
    */
-  async findByUserAndMovie(userId: number, movieId: number) {
+  async findByUserAndMedia(userId: number, mediaId: number, mediaType: MediaType) {
     return prisma.favorite.findUnique({
       where: {
-        userId_movieId: {
+        userId_mediaId_mediaType: {
           userId,
-          movieId,
+          mediaId,
+          mediaType,
         },
       },
     });
@@ -50,14 +48,16 @@ export class FavoriteRepository {
    * @async
    * @method create
    * @param {number} userId - ID del usuario
-   * @param {number} movieId - ID de la película
+   * @param {number} mediaId - ID del medio
+   * @param {MediaType} mediaType - Tipo de medio
    * @returns {Promise<Favorite>} Favorito creado
    */
-  async create(userId: number, movieId: number) {
+  async create(userId: number, mediaId: number, mediaType: MediaType) {
     return prisma.favorite.create({
       data: {
         userId,
-        movieId,
+        mediaId,
+        mediaType,
       },
     });
   }
@@ -67,15 +67,17 @@ export class FavoriteRepository {
    * @async
    * @method delete
    * @param {number} userId - ID del usuario
-   * @param {number} movieId - ID de la película
+   * @param {number} mediaId - ID del medio
+   * @param {MediaType} mediaType - Tipo de medio
    * @returns {Promise<Favorite>} Favorito eliminado
    */
-  async delete(userId: number, movieId: number) {
+  async delete(userId: number, mediaId: number, mediaType: MediaType) {
     return prisma.favorite.delete({
       where: {
-        userId_movieId: {
+        userId_mediaId_mediaType: {
           userId,
-          movieId,
+          mediaId,
+          mediaType,
         },
       },
     });
@@ -88,32 +90,40 @@ export class FavoriteRepository {
    * @param {number} userId - ID del usuario
    * @param {number} [page=1] - Número de página
    * @param {number} [limit=20] - Cantidad por página
+   * @param {MediaType} [mediaType] - Filtrar por tipo de medio
    * @returns {Promise<{favorites: Favorite[], total: number}>} Lista de favoritos y total
    */
-  async findByUser(userId: number, page: number = 1, limit: number = 20) {
+  async findByUser(userId: number, page: number = 1, limit: number = 20, mediaType?: MediaType) {
     const skip = (page - 1) * limit;
+
+    const where = mediaType ? { userId, mediaType } : { userId };
 
     const [favorites, total] = await Promise.all([
       prisma.favorite.findMany({
-        where: { userId },
+        where,
         skip,
         take: limit,
         orderBy: { createdAt: 'desc' },
       }),
-      prisma.favorite.count({ where: { userId } }),
+      prisma.favorite.count({ where }),
     ]);
 
     return { favorites, total };
   }
 
   /**
-   * Cuenta el total de favoritos en el sistema.
+   * Obtiene los favoritos de TV de un usuario.
    * @async
-   * @method count
-   * @returns {Promise<number>} Total de favoritos
+   * @method getUserFavoriteTv
+   * @param {number} userId - ID del usuario
+   * @returns {Promise<number[]>} Array de IDs de series
    */
-  async count(): Promise<number> {
-    return prisma.favorite.count();
+  async getUserFavoriteTv(userId: number): Promise<number[]> {
+    const favorites = await prisma.favorite.findMany({
+      where: { userId, mediaType: 'TV' as MediaType },
+      select: { mediaId: true },
+    });
+    return favorites.map((f) => f.mediaId);
   }
 
   /**
@@ -125,10 +135,10 @@ export class FavoriteRepository {
    */
   async getUserFavoriteMovies(userId: number): Promise<number[]> {
     const favorites = await prisma.favorite.findMany({
-      where: { userId },
-      select: { movieId: true },
+      where: { userId, mediaType: 'MOVIE' as MediaType },
+      select: { mediaId: true },
     });
-    return favorites.map((f) => f.movieId);
+    return favorites.map((f) => f.mediaId);
   }
 }
 

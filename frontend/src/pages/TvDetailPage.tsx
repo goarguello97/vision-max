@@ -1,46 +1,46 @@
 /**
- * @fileoverview Página de detalle de película
- * @module pages/MovieDetailPage
+ * @fileoverview Página de detalle de serie de TV
+ * @module pages/TvDetailPage
  */
 
 import { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
-import { useMovieDetail } from '../shared/hooks/useMovies';
+import { useTvDetail } from '../shared/hooks/useTvShows';
 import { useAuth } from '../shared/hooks/useAuth';
 import { favoritesApi } from '../shared/utils/api';
 import Button from '../shared/components/Button';
-import styles from './MovieDetailPage.module.css';
+import styles from './TvDetailPage.module.css';
 
 const IMAGE_BASE_URL = import.meta.env.VITE_TMDB_IMAGE_URL || 'https://image.tmdb.org/t/p';
 
-export default function MovieDetailPage() {
+export default function TvDetailPage() {
   const { id } = useParams<{ id: string }>();
-  const movieId = Number(id);
-  const { movie, credits, reviews, isLoading, error } = useMovieDetail(movieId);
+  const tvId = Number(id);
+  const { tv, credits, reviews, isLoading, error } = useTvDetail(tvId);
   const { isAuthenticated, user } = useAuth();
   const [isFavorite, setIsFavorite] = useState(false);
   const [favoriteLoading, setFavoriteLoading] = useState(false);
 
   useEffect(() => {
-    if (isAuthenticated && user && movieId) {
-      favoritesApi.getAll(1, 100, 'MOVIE').then((res) => {
+    if (isAuthenticated && user && tvId) {
+      favoritesApi.getAll(1, 100, 'TV').then((res) => {
         if (res.data.success) {
           const ids = res.data.data.favorites.map((f) => f.mediaId);
-          setIsFavorite(ids.includes(movieId));
+          setIsFavorite(ids.includes(tvId));
         }
       });
     }
-  }, [isAuthenticated, user, movieId]);
+  }, [isAuthenticated, user, tvId]);
 
   const handleToggleFavorite = async () => {
     if (!isAuthenticated) return;
     setFavoriteLoading(true);
     try {
       if (isFavorite) {
-        await favoritesApi.remove(movieId, 'MOVIE');
+        await favoritesApi.remove(tvId, 'TV');
         setIsFavorite(false);
       } else {
-        await favoritesApi.add(movieId, 'MOVIE');
+        await favoritesApi.add(tvId, 'TV');
         setIsFavorite(true);
       }
     } catch {
@@ -59,60 +59,63 @@ export default function MovieDetailPage() {
     );
   }
 
-  if (error || !movie) {
+  if (error || !tv) {
     return (
       <div className={styles.error}>
-        <p>Error al cargar la película</p>
+        <p>Error al cargar la serie</p>
       </div>
     );
   }
 
-  const backdropUrl = movie.backdrop_path
-    ? `${IMAGE_BASE_URL}/w1280${movie.backdrop_path}`
+  const backdropUrl = tv.backdrop_path
+    ? `${IMAGE_BASE_URL}/w1280${tv.backdrop_path}`
     : null;
 
-  const posterUrl = movie.poster_path
-    ? `${IMAGE_BASE_URL}/w500${movie.poster_path}`
+  const posterUrl = tv.poster_path
+    ? `${IMAGE_BASE_URL}/w500${tv.poster_path}`
     : '/placeholder-poster.svg';
 
-  const director = credits?.crew.find((c) => c.job === 'Director');
+  const creator = credits?.crew.find((c) => c.job === 'Creator') || credits?.crew.find((c) => c.job === 'Director');
   const cast = credits?.cast.slice(0, 5);
 
   return (
     <div className={styles.detail}>
       {backdropUrl && (
         <div className={styles.backdrop}>
-          <img src={backdropUrl} alt={movie.title} className={styles.backdropImg} />
+          <img src={backdropUrl} alt={tv.name} className={styles.backdropImg} />
           <div className={styles.backdropOverlay}></div>
         </div>
       )}
 
       <div className={styles.content}>
         <div className={styles.posterWrapper}>
-          <img src={posterUrl} alt={movie.title} className={styles.poster} />
+          <img src={posterUrl} alt={tv.name} className={styles.poster} />
         </div>
 
         <div className={styles.info}>
-          <h1 className={styles.title}>{movie.title}</h1>
+          <h1 className={styles.title}>{tv.name}</h1>
 
-          {movie.tagline && (
-            <p className={styles.tagline}>"{movie.tagline}"</p>
+          {tv.tagline && (
+            <p className={styles.tagline}>"{tv.tagline}"</p>
           )}
 
           <div className={styles.meta}>
             <span className={styles.rating}>
-              ★ {movie.vote_average.toFixed(1)}
+              ★ {tv.vote_average.toFixed(1)}
             </span>
             <span className={styles.year}>
-              {movie.release_date?.split('-')[0]}
+              {tv.first_air_date?.split('-')[0]}
             </span>
-            {movie.runtime && (
-              <span className={styles.runtime}>{movie.runtime} min</span>
-            )}
+            <span className={styles.seasons}>
+              {tv.number_of_seasons} {tv.number_of_seasons === 1 ? 'temporada' : 'temporadas'}
+            </span>
+            <span className={styles.episodes}>
+              {tv.number_of_episodes} episodios
+            </span>
           </div>
 
           <div className={styles.genres}>
-            {movie.genres?.map((genre) => (
+            {tv.genres?.map((genre) => (
               <span key={genre.id} className={styles.genre}>
                 {genre.name}
               </span>
@@ -136,13 +139,13 @@ export default function MovieDetailPage() {
 
           <div className={styles.overview}>
             <h3>Sinopsis</h3>
-            <p>{movie.overview}</p>
+            <p>{tv.overview}</p>
           </div>
 
-          {director && (
+          {creator && (
             <div className={styles.crew}>
-              <h3>Director</h3>
-              <p>{director.name}</p>
+              <h3>Creador</h3>
+              <p>{creator.name}</p>
             </div>
           )}
 

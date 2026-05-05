@@ -12,6 +12,11 @@ enum Role {
   ADMIN
 }
 
+enum MediaType {
+  MOVIE
+  TV
+}
+
 model User {
   id           Int        @id @default(autoincrement())
   email        String     @unique
@@ -27,25 +32,27 @@ model User {
 }
 
 model Favorite {
-  id        Int      @id @default(autoincrement())
+  id        Int       @id @default(autoincrement())
   userId    Int
-  movieId   Int
-  createdAt DateTime @default(now())
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  mediaId   Int
+  mediaType MediaType
+  createdAt DateTime  @default(now())
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  @@unique([userId, movieId])
+  @@unique([userId, mediaId, mediaType])
 }
 
 model Review {
-  id        Int      @id @default(autoincrement())
+  id        Int       @id @default(autoincrement())
   userId    Int
-  movieId   Int
+  mediaId   Int
+  mediaType MediaType
   content   String
   rating    Int
-  isHidden  Boolean  @default(false)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  isHidden  Boolean   @default(false)
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model AdminLog {

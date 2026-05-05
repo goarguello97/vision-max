@@ -4,6 +4,7 @@
  */
 
 import prisma from '../database/client';
+import { MediaType } from '@prisma/client';
 
 /**
  * Interfaz de reseña con información del usuario.
@@ -23,7 +24,7 @@ interface ReviewWithUser {
 }
 
 /**
- * Repositorio que maneja las operaciones de reseñas de películas.
+ * Repositorio que maneja las operaciones de reseñas de películas y series.
  * @class ReviewRepository
  */
 export class ReviewRepository {
@@ -49,18 +50,20 @@ export class ReviewRepository {
   }
 
   /**
-   * Busca una reseña por usuario y película.
+   * Busca una reseña por usuario y medio.
    * @async
-   * @method findByUserAndMovie
+   * @method findByUserAndMedia
    * @param {number} userId - ID del usuario
-   * @param {number} movieId - ID de la película
+   * @param {number} mediaId - ID del medio
+   * @param {MediaType} mediaType - Tipo de medio
    * @returns {Promise<Review | null>} Reseña encontrada o null
    */
-  async findByUserAndMovie(userId: number, movieId: number) {
+  async findByUserAndMedia(userId: number, mediaId: number, mediaType: MediaType) {
     return prisma.review.findFirst({
       where: {
         userId,
-        movieId,
+        mediaId,
+        mediaType,
       },
     });
   }
@@ -74,7 +77,8 @@ export class ReviewRepository {
    */
   async create(data: {
     userId: number;
-    movieId: number;
+    mediaId: number;
+    mediaType: MediaType;
     content: string;
     rating: number;
   }) {
@@ -131,21 +135,23 @@ export class ReviewRepository {
   }
 
   /**
-   * Obtiene las reseñas de una película con paginación.
+   * Obtiene las reseñas de un medio con paginación.
    * @async
-   * @method findByMovie
-   * @param {number} movieId - ID de la película
+   * @method findByMedia
+   * @param {number} mediaId - ID del medio
+   * @param {MediaType} mediaType - Tipo de medio
    * @param {number} [page=1] - Número de página
    * @param {number} [limit=20] - Cantidad por página
    * @returns {Promise<{reviews: Review[], total: number}>} Lista de reseñas y total
    */
-  async findByMovie(movieId: number, page: number = 1, limit: number = 20) {
+  async findByMedia(mediaId: number, mediaType: MediaType, page: number = 1, limit: number = 20) {
     const skip = (page - 1) * limit;
 
     const [reviews, total] = await Promise.all([
       prisma.review.findMany({
         where: {
-          movieId,
+          mediaId,
+          mediaType,
           isHidden: false,
         },
         skip,
@@ -162,7 +168,8 @@ export class ReviewRepository {
       }),
       prisma.review.count({
         where: {
-          movieId,
+          mediaId,
+          mediaType,
           isHidden: false,
         },
       }),

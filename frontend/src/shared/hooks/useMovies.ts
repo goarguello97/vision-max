@@ -4,7 +4,7 @@
  */
 
 import { useState, useEffect, useCallback } from 'react';
-import { movieApi } from '../utils/api';
+import { movieApi, reviewsApi } from '../utils/api';
 import type { Movie, MovieDetail, Credits, Review } from '../types';
 
 /**
@@ -106,7 +106,7 @@ export function useMovieDetail(id: number): UseMovieDetailReturn {
       try {
         const [movieResponse, reviewsResponse] = await Promise.all([
           movieApi.getById(id),
-          movieApi.getReviews(id),
+          reviewsApi.getByMedia(id, 'MOVIE'),
         ]);
 
         if (movieResponse.data.success) {

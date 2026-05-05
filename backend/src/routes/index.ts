@@ -5,6 +5,8 @@
 
 import { Router } from 'express';
 import moviesRouter from './movies';
+import tvRouter from './tv';
+import searchRouter from './search';
 import authRouter from './auth';
 import favoritesRouter from './favorites';
 import reviewsRouter from './reviews';
@@ -21,6 +23,16 @@ router.use('/auth', authRouter);
  * Rutas de películas (/movies)
  */
 router.use('/movies', moviesRouter);
+
+/**
+ * Rutas de series de TV (/tv)
+ */
+router.use('/tv', tvRouter);
+
+/**
+ * Rutas de búsqueda (/search)
+ */
+router.use('/search', searchRouter);
 
 /**
  * Rutas de favoritos (/favorites)

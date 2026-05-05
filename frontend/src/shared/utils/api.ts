@@ -4,7 +4,11 @@
  */
 
 import axios from 'axios';
-import type { MovieResponse, MovieDetail, Credits, User, Review, AuthResponse } from '../types';
+import type {
+  MovieResponse, MovieDetail, Credits,
+  TvResponse, TvShowDetail, TvCredits,
+  User, Review, AuthResponse, MediaType, SearchAllResponse
+} from '../types';
 
 const api = axios.create({
   baseURL: import.meta.env.VITE_API_URL || 'http://localhost:3000',
@@ -37,9 +41,22 @@ export const movieApi = {
 
   getById: (id: number) =>
     api.get<{ success: boolean; data: { movie: MovieDetail; credits: Credits } }>(`/movies/${id}`),
+};
 
-  getReviews: (movieId: number, page = 1) =>
-    api.get<{ success: boolean; data: { reviews: Review[]; total: number } }>(`/movies/${movieId}/reviews?page=${page}`),
+export const tvApi = {
+  getPopular: (page = 1) =>
+    api.get<{ success: boolean; data: TvResponse }>(`/tv?page=${page}`),
+
+  search: (query: string, page = 1) =>
+    api.get<{ success: boolean; data: TvResponse }>(`/tv/search?query=${query}&page=${page}`),
+
+  getById: (id: number) =>
+    api.get<{ success: boolean; data: { tv: TvShowDetail; credits: TvCredits } }>(`/tv/${id}`),
+};
+
+export const searchApi = {
+  searchAll: (query: string, page = 1) =>
+    api.get<{ success: boolean; data: SearchAllResponse }>(`/search/all?query=${query}&page=${page}`),
 };
 
 export const authApi = {
@@ -63,18 +80,21 @@ export const authApi = {
 };
 
 export const favoritesApi = {
-  getAll: (page = 1, limit = 20) =>
-    api.get<{ success: boolean; data: { favorites: { movieId: number }[]; total: number } }>(`/favorites?page=${page}&limit=${limit}`),
+  getAll: (page = 1, limit = 20, mediaType?: MediaType) => {
+    const params = new URLSearchParams({ page: page.toString(), limit: limit.toString() });
+    if (mediaType) params.append('mediaType', mediaType);
+    return api.get<{ success: boolean; data: { favorites: { mediaId: number; mediaType: MediaType }[]; total: number } }>(`/favorites?${params}`);
+  },
 
-  add: (movieId: number) =>
-    api.post<{ success: boolean }>(`/favorites/${movieId}`),
+  add: (mediaId: number, mediaType: MediaType) =>
+    api.post<{ success: boolean }>(`/favorites/${mediaType}/${mediaId}`),
 
-  remove: (movieId: number) =>
-    api.delete<{ success: boolean }>(`/favorites/${movieId}`),
+  remove: (mediaId: number, mediaType: MediaType) =>
+    api.delete<{ success: boolean }>(`/favorites/${mediaType}/${mediaId}`),
 };
 
 export const reviewsApi = {
-  create: (data: { movieId: number; content: string; rating: number }) =>
+  create: (data: { mediaId: number; mediaType: MediaType; content: string; rating: number }) =>
     api.post<{ success: boolean }>('/reviews', data),
 
   update: (id: number, data: { content?: string; rating?: number }) =>
@@ -82,6 +102,9 @@ export const reviewsApi = {
 
   delete: (id: number) =>
     api.delete<{ success: boolean }>(`/reviews/${id}`),
+
+  getByMedia: (mediaId: number, mediaType: MediaType, page = 1) =>
+    api.get<{ success: boolean; data: { reviews: Review[]; total: number } }>(`/reviews/${mediaType}/${mediaId}?page=${page}`),
 };
 
 export const adminApi = {
