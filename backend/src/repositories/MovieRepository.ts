@@ -145,6 +145,20 @@ class MovieRepository {
     const response = await tmdbClient.get(`/movie/${movieId}/reviews`);
     return (response as { results: unknown[] }).results;
   }
+
+  async getByIds(ids: number[]): Promise<unknown[]> {
+    logger.info('MovieRepository.getByIds', { ids: ids.length, mockMode: config.mockMode });
+
+    if (config.mockMode || ids.length === 0) {
+      return [];
+    }
+
+    const results = await Promise.all(
+      ids.map((id) => tmdbClient.get(`/movie/${id}`))
+    );
+
+    return results;
+  }
 }
 
 export const movieRepository = new MovieRepository();

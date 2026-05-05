@@ -63,6 +63,24 @@ export class FavoriteController {
       data: { favorites: result.favorites, total: result.total, page, limit },
     });
   }
+
+  async getFavoritesWithDetails(req: Request, res: Response): Promise<void> {
+    const user = (req as unknown as { user: { id: number } }).user;
+    const page = parseInt(req.query.page as string, 10) || 1;
+    const limit = parseInt(req.query.limit as string, 10) || 20;
+    const mediaType = req.query.mediaType as MediaType;
+
+    if (!['MOVIE', 'TV'].includes(mediaType)) {
+      res.status(400).json({ success: false, message: 'Tipo de medio inválido' });
+      return;
+    }
+
+    const result = await favoriteService.getFavoritesWithDetails(user.id, mediaType, page, limit);
+    res.json({
+      success: true,
+      data: result,
+    });
+  }
 }
 
 export const favoriteController = new FavoriteController();
