@@ -8,6 +8,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
+import { isAxiosError } from 'axios';
 import { useAuth } from '../shared/hooks/useAuth';
 import Button from '../shared/components/Button';
 import styles from './AuthPage.module.css';
@@ -36,7 +37,11 @@ export default function LoginPage() {
       await login(data.email, data.password);
       navigate('/');
     } catch (err) {
-      setError('Credenciales inválidas');
+      if (isAxiosError<{ message?: string }>(err)) {
+        setError(err.response?.data?.message ?? 'Error al iniciar sesión');
+      } else {
+        setError('Error inesperado al iniciar sesión');
+      }
     } finally {
       setIsLoading(false);
     }

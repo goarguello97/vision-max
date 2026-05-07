@@ -91,6 +91,45 @@
   color: var(--color-bg-primary);
 }
 
+.bannedBadge {
+  background: #dc2626;
+  color: #fff;
+}
+
+.userRole {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+}
+
+.banButton {
+  padding: var(--spacing-xs) var(--spacing-md);
+  background: #dc2626;
+  color: #fff;
+  border: none;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  font-size: 0.75rem;
+  transition: background 200ms ease-out;
+}
+
+.banButton:hover:not(:disabled) {
+  background: #b91c1c;
+}
+
+.banButton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.unbanButton {
+  background: #16a34a;
+}
+
+.unbanButton:hover:not(:disabled) {
+  background: #15803d;
+}
+
 .loading, .unauthorized {
   text-align: center;
   padding: var(--spacing-2xl);

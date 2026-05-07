@@ -70,17 +70,18 @@ export class AuthService {
     logger.info('AuthService.login', { email: input.email });
 
     const user = await userRepository.findByEmail(input.email);
+    
     if (!user) {
-      throw new UnauthorizedError('Credenciales inválidas');
-    }
-
-    const isValidPassword = await comparePassword(input.password, user.passwordHash);
-    if (!isValidPassword) {
       throw new UnauthorizedError('Credenciales inválidas');
     }
 
     if (user.isBanned) {
       throw new ForbiddenError('Usuario baneado');
+    }
+
+    const isValidPassword = await comparePassword(input.password, user.passwordHash);
+    if (!isValidPassword) {
+      throw new UnauthorizedError('Credenciales inválidas');
     }
 
     const payload: UserPayload = {

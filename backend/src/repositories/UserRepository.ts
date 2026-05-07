@@ -89,6 +89,7 @@ export class UserRepository {
           email: true,
           username: true,
           role: true,
+          isBanned: true,
           createdAt: true,
         },
       }),

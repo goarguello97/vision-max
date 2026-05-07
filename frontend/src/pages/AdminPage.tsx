@@ -20,6 +20,7 @@ export default function AdminPage() {
   } | null>(null);
   const [users, setUsers] = useState<User[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [banningUserId, setBanningUserId] = useState<number | null>(null);
 
   useEffect(() => {
     if (isAuthenticated && user?.role === 'ADMIN') {
@@ -35,6 +36,36 @@ export default function AdminPage() {
         .finally(() => setIsLoading(false));
     }
   }, [isAuthenticated, user?.role]);
+
+  const handleBanUser = async (userId: number) => {
+    setBanningUserId(userId);
+    try {
+      const res = await adminApi.banUser(userId);
+      if (res.data.success) {
+        setUsers((prev) => prev.map((u) => (u.id === userId ? { ...u, isBanned: true } : u)));
+        setStats((prev) => prev ? { ...prev, bannedUsers: prev.bannedUsers + 1 } : null);
+      }
+    } catch (error) {
+      console.error('Error al banear usuario:', error);
+    } finally {
+      setBanningUserId(null);
+    }
+  };
+
+  const handleUnbanUser = async (userId: number) => {
+    setBanningUserId(userId);
+    try {
+      const res = await adminApi.unbanUser(userId);
+      if (res.data.success) {
+        setUsers((prev) => prev.map((u) => (u.id === userId ? { ...u, isBanned: false } : u)));
+        setStats((prev) => prev ? { ...prev, bannedUsers: prev.bannedUsers - 1 } : null);
+      }
+    } catch (error) {
+      console.error('Error al desbanear usuario:', error);
+    } finally {
+      setBanningUserId(null);
+    }
+  };
 
   if (!isAuthenticated) {
     return (
@@ -96,7 +127,15 @@ export default function AdminPage() {
                     <span className={`${styles.badge} ${u.role === 'ADMIN' ? styles.adminBadge : ''}`}>
                       {u.role}
                     </span>
+                    {u.isBanned && <span className={`${styles.badge} ${styles.bannedBadge}`}>Baneado</span>}
                   </div>
+                  <button
+                    className={`${styles.banButton} ${u.isBanned ? styles.unbanButton : ''}`}
+                    onClick={() => u.isBanned ? handleUnbanUser(u.id) : handleBanUser(u.id)}
+                    disabled={banningUserId === u.id || u.role === 'ADMIN'}
+                  >
+                    {banningUserId === u.id ? '...' : u.isBanned ? 'Desbanear' : 'Banear'}
+                  </button>
                 </div>
               ))}
             </div>
