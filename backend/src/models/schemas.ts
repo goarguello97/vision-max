@@ -78,3 +78,27 @@ export const paginationSchema = z.object({
 
 /** Tipo inferido del esquema de paginación */
 export type PaginationParams = z.infer<typeof paginationSchema>;
+
+/**
+ * Esquema de validación para actualización de perfil.
+ * @constant {z.ZodObject}
+ */
+export const updateProfileSchema = z.object({
+  email: z.string().email('Email inválido').max(255, 'Email demasiado largo').optional(),
+  username: z.string().min(3, 'Username mínimo 3 caracteres').max(50, 'Username demasiado largo').optional(),
+});
+
+/** Tipo inferido del esquema de actualización de perfil */
+export type UpdateProfileInput = z.infer<typeof updateProfileSchema>;
+
+/**
+ * Esquema de validación para cambio de contraseña.
+ * @constant {z.ZodObject}
+ */
+export const changePasswordSchema = z.object({
+  currentPassword: z.string().min(1, 'Password actual requerido'),
+  newPassword: z.string().min(6, 'Password mínimo 6 caracteres').max(100, 'Password demasiado largo'),
+});
+
+/** Tipo inferido del esquema de cambio de contraseña */
+export type ChangePasswordInput = z.infer<typeof changePasswordSchema>;

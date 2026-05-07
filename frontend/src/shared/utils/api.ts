@@ -77,6 +77,12 @@ export const authApi = {
 
   checkEmail: (email: string) =>
     api.get<{ available: boolean }>('/auth/check-email', { params: { email } }),
+
+  updateProfile: (data: { email?: string; username?: string }) =>
+    api.put<AuthResponse>('/auth/profile', data),
+
+  changePassword: (data: { currentPassword: string; newPassword: string }) =>
+    api.put<{ success: boolean; message: string }>('/auth/change-password', data),
 };
 
 export const favoritesApi = {

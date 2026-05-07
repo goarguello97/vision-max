@@ -8,7 +8,7 @@ import { hashPassword, comparePassword } from '../utils/bcrypt';
 import { generateToken } from '../utils/jwt';
 import { AuthUser, UserPayload } from '../models/User';
 import { ConflictError, UnauthorizedError, NotFoundError, ForbiddenError } from '../utils/AppError';
-import { RegisterInput, LoginInput } from '../models/schemas';
+import { RegisterInput, LoginInput, UpdateProfileInput, ChangePasswordInput } from '../models/schemas';
 import { logger } from '../utils/logger';
 
 /**
@@ -128,6 +128,81 @@ export class AuthService {
       role: user.role,
       isBanned: user.isBanned,
     };
+  }
+
+  /**
+   * Actualiza el perfil del usuario.
+   * @async
+   * @method updateProfile
+   * @param {number} userId - ID del usuario
+   * @param {UpdateProfileInput} input - Datos a actualizar
+   * @returns {Promise<AuthUser>} Usuario actualizado
+   * @throws {ConflictError} Si el email o username ya están en uso
+   */
+  async updateProfile(userId: number, input: UpdateProfileInput): Promise<AuthUser> {
+    logger.info('AuthService.updateProfile', { userId });
+
+    const user = await userRepository.findById(userId);
+    if (!user) {
+      throw new NotFoundError('Usuario no encontrado');
+    }
+
+    if (input.email && input.email !== user.email) {
+      const existingEmail = await userRepository.findByEmail(input.email);
+      if (existingEmail) {
+        throw new ConflictError('El email ya está registrado');
+      }
+    }
+
+    if (input.username && input.username !== user.username) {
+      const existingUsername = await userRepository.findByUsername(input.username);
+      if (existingUsername) {
+        throw new ConflictError('El nombre de usuario ya está en uso');
+      }
+    }
+
+    const updatedUser = await userRepository.update(userId, {
+      email: input.email,
+      username: input.username,
+    });
+
+    logger.info('Profile updated successfully', { userId });
+
+    return {
+      id: updatedUser.id,
+      email: updatedUser.email,
+      username: updatedUser.username,
+      role: updatedUser.role,
+      isBanned: updatedUser.isBanned,
+    };
+  }
+
+  /**
+   * Cambia la contraseña del usuario.
+   * @async
+   * @method changePassword
+   * @param {number} userId - ID del usuario
+   * @param {ChangePasswordInput} input - Contraseña actual y nueva
+   * @returns {Promise<void>}
+   * @throws {UnauthorizedError} Si la contraseña actual es incorrecta
+   */
+  async changePassword(userId: number, input: ChangePasswordInput): Promise<void> {
+    logger.info('AuthService.changePassword', { userId });
+
+    const user = await userRepository.findById(userId);
+    if (!user) {
+      throw new NotFoundError('Usuario no encontrado');
+    }
+
+    const isValidPassword = await comparePassword(input.currentPassword, user.passwordHash);
+    if (!isValidPassword) {
+      throw new UnauthorizedError('Contraseña actual incorrecta');
+    }
+
+    const passwordHash = await hashPassword(input.newPassword);
+    await userRepository.update(userId, { passwordHash });
+
+    logger.info('Password changed successfully', { userId });
   }
 }
 

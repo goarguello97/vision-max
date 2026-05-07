@@ -15,6 +15,7 @@ interface UseAuthReturn {
   register: (email: string, password: string, username: string) => Promise<void>;
   logout: () => Promise<void>;
   refetch: () => Promise<void>;
+  updateProfile: (data: { email?: string; username?: string }) => Promise<void>;
 }
 
 const AuthContext = createContext<UseAuthReturn | undefined>(undefined);
@@ -67,6 +68,15 @@ export function AuthProvider({ children }: AuthProviderProps) {
     setUser(null);
   };
 
+  const updateProfile = async (data: { email?: string; username?: string }) => {
+    const response = await authApi.updateProfile(data);
+    if (response.data.success && response.data.data) {
+      setUser(response.data.data);
+    } else {
+      throw new Error(response.data.message || 'Update failed');
+    }
+  };
+
   const value: UseAuthReturn = {
     user,
     isLoading,
@@ -75,6 +85,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
     register,
     logout,
     refetch,
+    updateProfile,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

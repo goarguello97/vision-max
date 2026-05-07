@@ -69,6 +69,25 @@ export class UserRepository {
   }
 
   /**
+   * Actualiza los datos de un usuario.
+   * @async
+   * @method update
+   * @param {number} userId - ID del usuario
+   * @param {Object} data - Datos a actualizar
+   * @returns {Promise<User>} Usuario actualizado
+   */
+  async update(userId: number, data: {
+    email?: string;
+    username?: string;
+    passwordHash?: string;
+  }): Promise<User> {
+    return prisma.user.update({
+      where: { id: userId },
+      data,
+    });
+  }
+
+  /**
    * Obtiene una lista paginada de usuarios.
    * @async
    * @method findAll

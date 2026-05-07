@@ -6,7 +6,7 @@
 import { Request, Response } from 'express';
 import { authService } from '../services/AuthService';
 import { userRepository } from '../repositories/UserRepository';
-import { registerSchema, loginSchema } from '../models/schemas';
+import { registerSchema, loginSchema, updateProfileSchema, changePasswordSchema } from '../models/schemas';
 import { ZodError } from 'zod';
 import { AppError } from '../utils/AppError';
 import { logger } from '../utils/logger';
@@ -186,6 +186,86 @@ export class AuthController {
     res.json({
       available: !exists,
     });
+  }
+
+  /**
+   * Actualiza el perfil del usuario autenticado.
+   * @async
+   * @method updateProfile
+   * @param {Request} req - Solicitud HTTP con datos de perfil
+   * @param {Response} res - Respuesta HTTP
+   * @returns {Promise<void>}
+   */
+  async updateProfile(req: Request, res: Response): Promise<void> {
+    try {
+      const user = (req as unknown as { user: { id: number } }).user;
+      const input = updateProfileSchema.parse(req.body);
+
+      const result = await authService.updateProfile(user.id, input);
+
+      res.json({
+        success: true,
+        data: result,
+      });
+    } catch (error) {
+      if (error instanceof ZodError) {
+        res.status(400).json({
+          success: false,
+          message: 'Validation error',
+          errors: error.errors,
+        });
+        return;
+      }
+      if (error instanceof AppError) {
+        res.status(error.statusCode).json({
+          status: 'error',
+          message: error.message,
+          code: error.code,
+        });
+        return;
+      }
+      throw error;
+    }
+  }
+
+  /**
+   * Cambia la contraseña del usuario autenticado.
+   * @async
+   * @method changePassword
+   * @param {Request} req - Solicitud HTTP con contraseñas
+   * @param {Response} res - Respuesta HTTP
+   * @returns {Promise<void>}
+   */
+  async changePassword(req: Request, res: Response): Promise<void> {
+    try {
+      const user = (req as unknown as { user: { id: number } }).user;
+      const input = changePasswordSchema.parse(req.body);
+
+      await authService.changePassword(user.id, input);
+
+      res.json({
+        success: true,
+        message: 'Contraseña cambiada correctamente',
+      });
+    } catch (error) {
+      if (error instanceof ZodError) {
+        res.status(400).json({
+          success: false,
+          message: 'Validation error',
+          errors: error.errors,
+        });
+        return;
+      }
+      if (error instanceof AppError) {
+        res.status(error.statusCode).json({
+          status: 'error',
+          message: error.message,
+          code: error.code,
+        });
+        return;
+      }
+      throw error;
+    }
   }
 }
 

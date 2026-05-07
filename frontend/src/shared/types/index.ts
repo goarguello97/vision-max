@@ -18,6 +18,7 @@ export interface User {
   username: string;
   role: 'USER' | 'ADMIN';
   isBanned: boolean;
+  createdAt: string;
 }
 
 /**
