@@ -8,7 +8,7 @@ import { useAuth } from '../shared/hooks/useAuth';
 import { favoritesApi } from '../shared/utils/api';
 import MovieCard from '../shared/components/MovieCard';
 import TvCard from '../shared/components/TvCard';
-import type { Movie, TvShow, MediaType } from '../shared/types';
+import type { Movie, TvShow } from '../shared/types';
 import styles from './FavoritesPage.module.css';
 
 type TabType = 'MOVIE' | 'TV';
@@ -19,7 +19,6 @@ export default function FavoritesPage() {
   const [movies, setMovies] = useState<Movie[]>([]);
   const [tvShows, setTvShows] = useState<TvShow[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [total, setTotal] = useState(0);
 
   useEffect(() => {
     if (isAuthenticated) {
@@ -32,7 +31,6 @@ export default function FavoritesPage() {
             } else {
               setTvShows(res.data.data.items as TvShow[]);
             }
-            setTotal(res.data.data.total);
           }
         })
         .catch(() => {
