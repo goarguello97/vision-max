@@ -162,4 +162,8 @@ router.get('/check-username', authController.checkUsername);
  */
 router.get('/check-email', authController.checkEmail);
 
+router.put('/profile', authMiddleware, authController.updateProfile);
+
+router.put('/change-password', authMiddleware, authController.changePassword);
+
 export default router;

@@ -12,6 +12,7 @@ import RegisterPage from './pages/RegisterPage';
 import MovieDetailPage from './pages/MovieDetailPage';
 import TvDetailPage from './pages/TvDetailPage';
 import FavoritesPage from './pages/FavoritesPage';
+import ProfilePage from './pages/ProfilePage';
 import AdminPage from './pages/AdminPage';
 
 function App() {
@@ -25,6 +26,7 @@ function App() {
         <Route path="movie/:id" element={<MovieDetailPage />} />
         <Route path="tv/:id" element={<TvDetailPage />} />
         <Route path="favorites" element={<FavoritesPage />} />
+        <Route path="profile" element={<ProfilePage />} />
         <Route path="admin" element={<AdminPage />} />
       </Route>
     </Routes>

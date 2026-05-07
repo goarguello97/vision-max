@@ -3,6 +3,7 @@
  * @module shared/components/Navbar
  */
 
+import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
 import Button from './Button';
@@ -11,10 +12,17 @@ import styles from './Navbar.module.css';
 export default function Navbar() {
   const { user, isAuthenticated, logout } = useAuth();
   const navigate = useNavigate();
+  const [dropdownOpen, setDropdownOpen] = useState(false);
 
   const handleLogout = async () => {
+    setDropdownOpen(false);
     await logout();
     navigate('/');
+  };
+
+  const handleProfileClick = () => {
+    setDropdownOpen(false);
+    navigate('/profile');
   };
 
   return (
@@ -41,10 +49,23 @@ export default function Navbar() {
         <div className={styles.auth}>
           {isAuthenticated ? (
             <div className={styles.userMenu}>
-              <span className={styles.username}>{user?.username}</span>
-              <Button variant="ghost" size="sm" onClick={handleLogout}>
-                Cerrar sesión
-              </Button>
+              <button
+                className={styles.userButton}
+                onClick={() => setDropdownOpen(!dropdownOpen)}
+              >
+                <span className={styles.username}>{user?.username}</span>
+                <span className={styles.dropdownArrow}>▼</span>
+              </button>
+              {dropdownOpen && (
+                <div className={styles.dropdown}>
+                  <button className={styles.dropdownItem} onClick={handleProfileClick}>
+                    Mi Perfil
+                  </button>
+                  <button className={styles.dropdownItem} onClick={handleLogout}>
+                    Cerrar sesión
+                  </button>
+                </div>
+              )}
             </div>
           ) : (
             <>
