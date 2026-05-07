@@ -25,7 +25,6 @@ export default function MovieDetailPage() {
   const [userReview, setUserReview] = useState<Review | null>(null);
   const [showReviewForm, setShowReviewForm] = useState(false);
   const [localReviews, setLocalReviews] = useState<Review[]>([]);
-  const [reviewsLoading, setReviewsLoading] = useState(false);
   const reviewsRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -48,12 +47,11 @@ export default function MovieDetailPage() {
   }, [isAuthenticated, user, movieId]);
 
   const loadLocalReviews = () => {
-    setReviewsLoading(true);
     reviewsApi.getByMedia(movieId, 'MOVIE').then((res) => {
       if (res.data.success) {
         setLocalReviews(res.data.data.reviews);
       }
-    }).finally(() => setReviewsLoading(false));
+    });
   };
 
   const handleToggleFavorite = async () => {
