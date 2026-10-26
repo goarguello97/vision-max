@@ -1,0 +1,76 @@
+# Entorno de desarrollo: Node corre solo dentro de los contenedores.
+# El código se monta desde el host. node_modules vive en volúmenes nombrados
+# (binarios de Linux y sin la lentitud del bind mount de Windows).
+#
+#   docker compose run --rm server npm install   # instalar / actualizar dependencias
+#   docker compose up                            # server :4000 + client :5173
+
+x-node: &node
+  image: node:24-bookworm-slim
+  working_dir: /app
+  volumes:
+    - .:/app
+    - node_modules:/app/node_modules
+    - server_node_modules:/app/apps/server/node_modules
+    - client_node_modules:/app/apps/client/node_modules
+    - shared_node_modules:/app/packages/shared/node_modules
+
+services:
+  server:
+    <<: *node
+    command: npm run dev -w apps/server
+    env_file:
+      - path: apps/server/.env
+        required: false
+    environment:
+      PORT: "4000"
+    ports:
+      - "4000:4000"
+
+  client:
+    <<: *node
+    command: npm run dev -w apps/client -- --host 0.0.0.0
+    environment:
+      API_PROXY_TARGET: http://server:4000
+      VITE_USE_POLLING: "true"
+    ports:
+      - "5173:5173"
+    depends_on:
+      - server
+
+  # Tests (docker compose run --rm test): Postgres efímero propio, nunca la base de Supabase.
+  test:
+    <<: *node
+    profiles: [test]
+    command: npm test
+    environment:
+      TEST_DATABASE_URL: postgres://postgres:test@db-test:5432/visionmax_test
+    depends_on:
+      db-test:
+        condition: service_healthy
+
+  db-test:
+    image: postgres:17-alpine
+    profiles: [test]
+    environment:
+      POSTGRES_PASSWORD: test
+      POSTGRES_DB: visionmax_test
+    tmpfs:
+      - /var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d visionmax_test"]
+      interval: 2s
+      timeout: 3s
+      retries: 15
+
+  # SMTP de desarrollo: atrapa los mails de recuperación. UI en http://localhost:8025
+  mailpit:
+    image: axllent/mailpit:v1.27
+    ports:
+      - "8025:8025"
+
+volumes:
+  node_modules:
+  server_node_modules:
+  client_node_modules:
+  shared_node_modules:

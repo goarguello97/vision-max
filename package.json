@@ -1,0 +1,22 @@
+{
+  "name": "vision-max",
+  "private": true,
+  "type": "module",
+  "workspaces": [
+    "packages/*",
+    "apps/*"
+  ],
+  "engines": {
+    "node": ">=24"
+  },
+  "scripts": {
+    "dev:server": "npm run dev -w apps/server",
+    "dev:client": "npm run dev -w apps/client",
+    "build": "npm run build -w apps/server && npm run build -w apps/client",
+    "typecheck": "npm run typecheck --workspaces --if-present",
+    "test": "npm test -w packages/shared && npm test -w apps/server"
+  },
+  "devDependencies": {
+    "typescript": "^5.9.2"
+  }
+}
